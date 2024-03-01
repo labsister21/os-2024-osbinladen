@@ -42,7 +42,7 @@ struct IDTGate {
     uint8_t gate_32: 1;
     uint8_t _r_bit_3: 1;
     uint8_t dpl: 2;
-    uint8_t p: 1;  
+    uint8_t valid_bit: 1;  
 
     // Last 16-bit (Bit 48 to 63)
     uint16_t offset_high;

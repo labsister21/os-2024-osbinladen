@@ -33,3 +33,9 @@ void pic_remap(void) {
     out(PIC1_DATA, PIC_DISABLE_ALL_MASK);
     out(PIC2_DATA, PIC_DISABLE_ALL_MASK);
 }
+
+void main_interrupt_handler(struct InterruptFrame frame) {
+    switch (frame.int_number) {
+        // ...
+    }
+}
