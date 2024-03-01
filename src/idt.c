@@ -33,8 +33,14 @@ void set_interrupt_gate(
     uint8_t  privilege
 ) {
     struct IDTGate *idt_int_gate = &interrupt_descriptor_table.table[int_vector];
-    // TODO : Set handler offset, privilege & segment
-    // Use &-bitmask, bitshift, and casting for offset 
+    
+    // Set handler offset
+    idt_int_gate->offset_low  = (uint32_t)handler_address & 0xFFFF;
+    idt_int_gate->offset_high = ((uint32_t)handler_address >> 16) & 0xFFFF;
+
+    // Set privilege level and segment selector
+    idt_int_gate->segment = gdt_seg_selector;
+    idt_int_gate->dpl = privilege;
 
     // Target system 32-bit and flag this as valid interrupt gate
     idt_int_gate->_r_bit_1    = INTERRUPT_GATE_R_BIT_1;
@@ -43,4 +49,5 @@ void set_interrupt_gate(
     idt_int_gate->gate_32     = 1;
     idt_int_gate->valid_bit   = 1;
 }
+
 
