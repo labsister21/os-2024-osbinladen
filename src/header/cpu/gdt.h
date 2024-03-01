@@ -25,17 +25,26 @@ extern struct GDTR _gdt_gdtr;
  * @param type_bit     4-bit contain type flags
  * @param non_system   1-bit contain system
  */
+
 struct SegmentDescriptor {
     // First 32-bit
-    uint16_t segment_low;
-    uint16_t base_low;
+    uint16_t segment_low;   
+    uint16_t base_low;    
 
     // Next 16-bit (Bit 32 to 47)
-    uint8_t base_mid;
-    uint8_t type_bit   : 4;
-    uint8_t non_system : 1;
-    // TODO : Continue SegmentDescriptor definition
+    uint8_t base_mid;     // Middle 8 bits of segment base address
+    uint8_t type_bit: 4;      // Segment type (e.g., code, data)
+    uint8_t non_system: 1;         // System segment flag (0 = system, 1 = non-system)
+    uint8_t dpl: 2;       // Descriptor Privilege Level (0-3)
+    uint8_t p: 1;         // Present bit (indicates if segment is in memory) 
 
+    // Last 16-bit (Bit 48 to 63)
+    uint8_t limit_high: 4; // Upper 4 bits of segment limit
+    uint8_t avl: 1;        // Available for system software
+    uint8_t l: 1;          // 64-bit code segment flag
+    uint8_t db: 1;         // Default operation size (1 = 32-bit, 0 = 16-bit)
+    uint8_t g: 1;          // Granularity flag (1 = 4KB page granularity) 
+    uint8_t base_high: 8;   // Upper 8 bits of segment base address
 } __attribute__((packed));
 
 /**
