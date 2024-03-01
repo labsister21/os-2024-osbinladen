@@ -1,0 +1,5 @@
+
+bin/gdt.o
+bin/kernel
+bin/kernel.o
+bin/OS2024.iso
