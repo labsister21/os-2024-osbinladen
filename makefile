@@ -22,14 +22,12 @@ run: all
 all: build
 build: iso
 clean:
-	rm -rf *.o *.iso $(OUTPUT_FOLDER)/kernel
-
-
+	rm -rf $(OUTPUT_FOLDER)*.o $(OUTPUT_FOLDER)*.iso $(OUTPUT_FOLDER)/kernel
 
 kernel:
+	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/kernel.c -o $(OUTPUT_FOLDER)/kernel.o
 	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/kernel-entrypoint.s -o $(OUTPUT_FOLDER)/kernel-entrypoint.o
-	@$(CC) $(CFLAGS) $(SOURCE_FOLDER)/kernel.c -o $(OUTPUT_FOLDER)/kernel.o
-	@$(LIN) $(LFLAGS) $(OUTPUT_FOLDER)/kernel-entrypoint.o $(OUTPUT_FOLDER)/kernel.o -o $(OUTPUT_FOLDER)/kernel
+	@$(LIN) $(LFLAGS) bin/*.o -o $(OUTPUT_FOLDER)/kernel
 	@echo Linking object files and generate elf32...
 	@rm -f *.o
 
