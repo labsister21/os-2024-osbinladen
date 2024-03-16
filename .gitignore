@@ -1,5 +1,3 @@
-
-bin/gdt.o
+bin/*.iso
+bin/*.o
 bin/kernel
-bin/kernel.o
-bin/OS2024.iso
