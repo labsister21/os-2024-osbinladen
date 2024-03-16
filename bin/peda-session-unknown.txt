@@ -1,0 +1,9 @@
+break fat32.c:60
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
