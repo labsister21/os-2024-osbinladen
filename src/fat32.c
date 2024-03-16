@@ -3,16 +3,7 @@
 #include <stddef.h>
 #include "header/stdlib/string.h"
 #include "header/filesystem/fat32.h"
-#include "header/driver/disk.h"
 
-
-// FSI_LeadSig (4 bytes : 0x41615252)
-// FSI_Reserved1 (480 bytes : zeros)
-// FSI_StructSig (4 bytes : 0x61417272)
-// FSI_Free_Count (4 bytes : 0xFFFFFFFF)
-// FSI_Nxt_Free (4 bytes : 0xFFFFFFFF)
-// FSI_Reserved2 (12 bytes : zeros)
-// FSI_TrailSig (4 bytes : 0xAA550000)
 const uint8_t fs_signature[BLOCK_SIZE] = {
 <<<<<<< Updated upstream
     0x41, 0x61, 0x52, 0x52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,
