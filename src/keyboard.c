@@ -4,9 +4,9 @@
 #include "header/stdlib/string.h"
 
 static struct KeyboardDriverState keyboard_state = {
-    false,
-    false,
-    0x0
+    .read_extended_mode = false,
+    .keyboard_input_on = false,
+    .keyboard_buffer = 0x0
 };
 
 const char keyboard_scancode_1_to_ascii_map[256] = {
