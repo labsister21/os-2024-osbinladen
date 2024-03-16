@@ -48,12 +48,6 @@ void keyboard_isr(void) {
 
     if (keyboard_state.keyboard_input_on){
       char key = keyboard_scancode_1_to_ascii_map[scancode];
-      if(key == '\n'){
-        framebuffer_set_cursor(10, 50);
-        // framebuffer_set_cursor(framebuffer_get_cursor() / SCREEN_WIDTH, 0);
-        // framebuffer_write(framebuffer_get_cursor()/ SCREEN_WIDTH, framebuffer_get_cursor() % SCREEN_WIDTH, ' ', 0xF, 0);
-      }
-      keyboard_state.keyboard_buffer = key;
     }
 
     pic_ack(PIC1_OFFSET + IRQ_KEYBOARD);

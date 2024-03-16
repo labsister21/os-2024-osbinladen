@@ -8,6 +8,7 @@
 
 void framebuffer_set_cursor(uint8_t r, uint8_t c) {
     uint16_t pos = r * SCREEN_WIDTH + c;
+    // framebuffer_write(r, c, ' ', 0xF, 0);
 	out(CURSOR_PORT_CMD, 0x0F);
 	out(CURSOR_PORT_DATA, (uint8_t) (pos & 0xFF));
 	out(CURSOR_PORT_CMD, 0x0E);
@@ -15,15 +16,22 @@ void framebuffer_set_cursor(uint8_t r, uint8_t c) {
 }
 
 void framebuffer_write(uint8_t row, uint8_t col, char c, uint8_t fg, uint8_t bg) {
-    framebuffer_set_cursor(row, col);
+    framebuffer_set_cursor(row, col + 1);
     uint16_t attrib = (bg << 4) | (fg & 0x0F);
     volatile uint16_t * where;
     where = (volatile uint16_t *)0xB8000 + (row * SCREEN_WIDTH + col) ;
     *where = c | (attrib << 8);
 }
 
+void* better_memset(void *s, int c, size_t n) {
+    uint16_t *buf = (uint16_t*) s;
+    for (size_t i = 0; i < n; i++)
+        buf[i] = (uint16_t) c;
+    return s;
+}
+
 void framebuffer_clear(void) {
-    memset(FRAMEBUFFER_MEMORY_OFFSET,0x0700, SCREEN_WIDTH * SCREEN_HEIGHT * 2);
+    better_memset(FRAMEBUFFER_MEMORY_OFFSET, 0x0F20, SCREEN_WIDTH * SCREEN_HEIGHT * 2);
 }
 
 uint16_t framebuffer_get_cursor(void)
