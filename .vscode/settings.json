@@ -4,6 +4,7 @@
     "files.associations": {
         "interrupt.h": "c",
         "idt.h": "c",
-        "kernel-entrypoint.h": "c"
+        "kernel-entrypoint.h": "c",
+        "string.h": "c"
     },
 }
