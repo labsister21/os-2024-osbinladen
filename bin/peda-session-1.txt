@@ -1,3 +1,0 @@
-break interrupt.c:37
-
-set exec-wrapper logging enabled
