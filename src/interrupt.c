@@ -1,5 +1,6 @@
-#include "header/interrupt/interrupt.h"
+#include "header/cpu/interrupt.h"
 #include "header/cpu/portio.h"
+
 void io_wait(void) {
     out(0x80, 0);
 }
@@ -38,4 +39,8 @@ void main_interrupt_handler(struct InterruptFrame frame) {
     switch (frame.int_number) {
         // ...
     }
+}
+
+void activate_keyboard_interrupt(void) {
+    out(PIC1_DATA, in(PIC1_DATA) & ~(1 << IRQ_KEYBOARD));
 }

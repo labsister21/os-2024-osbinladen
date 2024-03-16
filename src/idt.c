@@ -1,5 +1,5 @@
 #include "header/interrupt/idt.h"
-#include "header/interrupt/interrupt.h"
+#include "header/cpu/interrupt.h"
 #include "header/cpu/gdt.h"
 // #include "intsetup.s"
 

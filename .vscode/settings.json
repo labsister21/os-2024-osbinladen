@@ -1,4 +1,9 @@
 {
     "debug.onTaskErrors": "debugAnyway",
     "cmake.configureOnOpen": false,
+    "files.associations": {
+        "interrupt.h": "c",
+        "idt.h": "c",
+        "kernel-entrypoint.h": "c"
+    },
 }
