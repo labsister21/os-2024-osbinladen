@@ -8,6 +8,8 @@
 #define FRAMEBUFFER_MEMORY_OFFSET ((uint8_t*) 0xB8000)
 #define CURSOR_PORT_CMD    0x03D4
 #define CURSOR_PORT_DATA   0x03D5
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 25
 
 /**
  * Terminal framebuffer
@@ -44,5 +46,7 @@ void framebuffer_set_cursor(uint16_t r, uint16_t c);
  *
  */
 void framebuffer_clear(void);
+
+uint16_t get_cursor_position(void);
 
 #endif
