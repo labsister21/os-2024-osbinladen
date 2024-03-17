@@ -2,9 +2,11 @@
     "debug.onTaskErrors": "debugAnyway",
     "cmake.configureOnOpen": false,
     "files.associations": {
+        "*.pl": "prolog",
         "interrupt.h": "c",
         "idt.h": "c",
         "kernel-entrypoint.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "stdbool.h": "c"
     },
 }

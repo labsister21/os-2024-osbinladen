@@ -31,6 +31,7 @@ const char keyboard_scancode_1_to_ascii_map[256] = {
 
 // Activate keyboard ISR / start listen keyboard & save to buffer
 void keyboard_state_activate(void){
+  activate_keyboard_interrupt();
   keyboard_state.keyboard_input_on = true;
 }
 
@@ -48,6 +49,7 @@ void keyboard_isr(void) {
 
     if (keyboard_state.keyboard_input_on){
       char key = keyboard_scancode_1_to_ascii_map[scancode];
+      keyboard_state.keyboard_buffer = key;
     }
 
     pic_ack(PIC1_OFFSET + IRQ_KEYBOARD);

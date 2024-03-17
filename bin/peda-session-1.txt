@@ -1,3 +1,11 @@
 break disk.c:31
 
 set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
+
+set exec-wrapper logging enabled
