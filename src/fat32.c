@@ -115,18 +115,22 @@ int8_t read(struct FAT32DriverRequest request){
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY){
         return -1;
     }
-    int i = 2;
-    while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
-        if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
-            if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0)
-                returnCode = 0;
-            else returnCode = 1;
-            
+    uint32_t current_cluster_number = request.parent_cluster_number;
+    while(current_cluster_number != FAT32_FAT_END_OF_FILE && returnCode == 2){
+        unsigned int i = 2;
+        while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
+            if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
+                if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0)
+                    returnCode = 0;
+                else returnCode = 1;
+                
+            }
+            if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
+                returnCode = 4;
+            }
+            i++;
         }
-        if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
-            returnCode = 4;
-        }
-        i++;
+        current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
     }
     if(returnCode == 4)returnCode = 2;
     return returnCode;
@@ -138,17 +142,21 @@ int8_t read_directory(struct FAT32DriverRequest request){
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY){
         return -1;
     }
-    int i = 2;
-    while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
-        if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
-            if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY)
-                returnCode = 0;
-            else returnCode = 1;
-            if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
-                returnCode = 4;
+    uint32_t current_cluster_number = request.parent_cluster_number;
+    while(current_cluster_number != FAT32_FAT_END_OF_FILE && returnCode == 2){
+        unsigned int i = 2;
+        while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
+            if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
+                if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY)
+                    returnCode = 0;
+                else returnCode = 1;
+                if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
+                    returnCode = 4;
+                }
             }
+            i++;
         }
-        i++;
+        current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
     }
     if(returnCode == 4)returnCode = 2;
     return returnCode;
