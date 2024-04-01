@@ -39,6 +39,7 @@ kernel:
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/disk.c -o $(OUTPUT_FOLDER)/disk.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/realModeGaming.c -o $(OUTPUT_FOLDER)/realModeGaming.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/graphics.c -o $(OUTPUT_FOLDER)/graphics.o
+	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/fat32.c -o $(OUTPUT_FOLDER)/fat32.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/intsetup.s -o $(OUTPUT_FOLDER)/intsetup.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/asmGaming.s -o $(OUTPUT_FOLDER)/asmGaming.o
 	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/kernel-entrypoint.s -o $(OUTPUT_FOLDER)/kernel-entrypoint.o

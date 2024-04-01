@@ -8,6 +8,12 @@
         "kernel-entrypoint.h": "c",
         "string.h": "c",
         "stdbool.h": "c",
-        "realmodegaming.h": "c"
+        "realmodegaming.h": "c",
+        "disk.h": "c",
+        "portio.h": "c",
+        "fat32.h": "c",
+        "libc-header-start.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c"
     },
 }
