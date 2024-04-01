@@ -45,5 +45,13 @@ void main_interrupt_handler(struct InterruptFrame frame) {
 }
 
 void activate_keyboard_interrupt(void) {
+    int thing = in(PIC1_DATA);
+    (void)thing;
     out(PIC1_DATA, in(PIC1_DATA) & ~(1 << IRQ_KEYBOARD));
+}
+
+void activate_timer_interrupt(void) {
+    int thing = in(PIC1_DATA);
+    (void)thing;
+    out(PIC1_DATA, in(PIC1_DATA) & ~(1 << IRQ_TIMER));
 }

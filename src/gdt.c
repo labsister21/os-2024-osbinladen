@@ -51,6 +51,36 @@ struct GlobalDescriptorTable global_descriptor_table = {
             1, //db
             1, //g
             0 //base high
+        },
+        {
+            0xFFFF, //segment low
+            0, //base low
+            0, //base mid
+            0b1010, // Executable 1 (Code segment) Direction 0 (Up) Readable 1 (True) Access 0 (default)
+            1, // 1 meaning code/data
+            0b00, // ring 0
+            1, // 1 = valid
+            0xF, //limit high
+            0, // not for system software
+            0, // Not 64 bit code
+            0, // 16 bit protected mode
+            0, // granularity 1
+            0 //base high
+        },
+        {
+            0xFFFF, //segment low
+            0, //base low
+            0, //base mid
+            0b0010, // Executable 0 (Data segment) Direction 0 (Up) Readable 1 (True) Access 0 (default)
+            1, // 1 meaning code/data
+            0b00, // ring 0
+            1, // 1 = valid
+            0xF, //limit high
+            0, // not for system software
+            0, // Not 64 bit code
+            0, // 16 bit protected mode
+            0, // granularity 1
+            0 //base high
         }
     }
 };

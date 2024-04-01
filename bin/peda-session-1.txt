@@ -1,11 +1,5 @@
-break disk.c:31
-
-set exec-wrapper logging enabled
-
-set exec-wrapper logging enabled
-
-set exec-wrapper logging enabled
-
-set exec-wrapper logging enabled
+break interrupt.c:40
+break interrupt.c:54
+break kernel.c:145
 
 set exec-wrapper logging enabled
