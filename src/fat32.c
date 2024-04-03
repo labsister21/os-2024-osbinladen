@@ -165,6 +165,7 @@ int8_t read(struct FAT32DriverRequest request){
             i++;
         }
         current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
+        read_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number,1);
         i=0;
     }
     if(returnCode == 4)returnCode = 2;
@@ -194,6 +195,7 @@ int8_t read_directory(struct FAT32DriverRequest request){
             i++;
         }
         current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
+        read_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number,1);
         i=0;
     }
     if(returnCode == 4)returnCode = 2;
