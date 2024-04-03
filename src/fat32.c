@@ -184,9 +184,9 @@ int8_t read_directory(struct FAT32DriverRequest request){
                     copy_long_cluster(request.buf,i);
                 }
                 else returnCode = 1;
-                if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
-                    returnCode = 4;
-                }
+            }
+            if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
+                returnCode = 4;
             }
             i++;
         }
