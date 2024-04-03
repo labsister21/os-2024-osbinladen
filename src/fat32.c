@@ -217,14 +217,19 @@ int8_t write(struct FAT32DriverRequest request){
     }
 
     // check if already exists
-    uint32_t dirLen = sizeof(struct FAT32DirectoryTable)/sizeof(struct FAT32DirectoryEntry);
-    for(uint32_t i = 1 ; i < dirLen ; i++){
+    int entry_num = -1;
+
+    uint32_t dirLen = CLUSTER_SIZE/sizeof(struct FAT32DirectoryEntry);
+    for(uint32_t i = 2 ; i < dirLen ; i++){
         struct FAT32DirectoryEntry current_entry = driver_state.dir_table_buf.table[i];
-        bool entry_valid = current_entry.undelete; 
+
         bool name_match = memcmp(current_entry.name, request.name, 8) == 0;
         bool ext_match = memcmp(current_entry.ext, request.ext, 3) == 0;
-
-        if (entry_valid && name_match && ext_match) {
+        if(current_entry.user_attribute != UATTR_NOT_EMPTY){
+            entry_num = i;
+            break;
+        }
+        if (name_match && ext_match) {
             return 1; 
         }
     }
@@ -232,20 +237,12 @@ int8_t write(struct FAT32DriverRequest request){
     uint32_t clusterNeeded = ((request.buffer_size)% CLUSTER_SIZE) == 0 ? ((request.buffer_size)/ CLUSTER_SIZE): ((request.buffer_size)/ CLUSTER_SIZE) +1;
 
 
-    int entry_num = -1;
-    for (uint32_t i = 1; i < dirLen && entry_num == -1; i++) {
-        if (driver_state.dir_table_buf.table[i].undelete == 0) {
-            entry_num = i;
-        }
-    }
-    if (entry_num == -1) {
-        return -1;
-    }
+   
 
     uint32_t start_cluster = get_empty_cluster();
-    // if(start_cluster == -1){
-    //     return -1;
-    // }
+    if((int)start_cluster == -1){
+        return -1;
+    }
 
     struct FAT32DirectoryEntry new_entry = {0};
 
@@ -253,7 +250,6 @@ int8_t write(struct FAT32DriverRequest request){
     memcpy(new_entry.ext, request.ext, 3);
     new_entry.cluster_low = start_cluster & 0xFFFF;
     new_entry.cluster_high = (start_cluster >> 16) & 0xFFFF;
-    new_entry.undelete = 1;
     new_entry.user_attribute  = UATTR_NOT_EMPTY;
 
     if (request.buffer_size == 0) {
@@ -277,7 +273,7 @@ int8_t write(struct FAT32DriverRequest request){
         for(uint32_t i = 1; i < clusterNeeded;i++){
             uint32_t next_cluster = get_empty_cluster();
             driver_state.fat_table.cluster_map[start_cluster] = next_cluster;
-            int offset = CLUSTER_SIZE*(i);
+            uint32_t offset = CLUSTER_SIZE*(i);
             write_clusters(request.buf + offset , next_cluster,1);
             start_cluster = next_cluster;
         }
