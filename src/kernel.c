@@ -10,6 +10,7 @@
 #include "header/filesystem/fat32.h"
 #include "header/realModeGaming.h"
 #include "header/driver/graphics.h"
+#include "archive_src/header/framebuffer.h"
 #include "imgdata/attack.h"
 
 //void kernel_setup(void) {
@@ -87,19 +88,21 @@
 //     }
 // }
 
-// void kernel_setup(void) {
-//     load_gdt(&_gdt_gdtr);
-//     pic_remap();
-//     activate_keyboard_interrupt();
-//     initialize_idt();
-//     framebuffer_clear();
-//     framebuffer_set_cursor(0, 0);
 
-//     struct BlockBuffer b;
-//     for (int i = 0; i < 512; i++) b.buf[i] = i % 16;
-//     write_blocks(&b, 17, 1);
-//     while (true);
-// }
+void kernel_setup(void) {
+    load_gdt(&_gdt_gdtr);
+    pic_remap();
+    activate_keyboard_interrupt();
+    initialize_idt();
+    framebuffer_clear();
+    framebuffer_set_cursor(0, 0);
+
+    struct BlockBuffer b;
+    for (int i = 0; i < 512; i++) b.buf[i] = i % 16;
+    write_blocks(&b, 17, 1);
+    while (true);
+}
+
         
 //     int col = 0;
 //     keyboard_state_activate();
@@ -110,55 +113,55 @@
 //     }
 // }
 
-void kernel_setup(void) {
-    load_gdt(&_gdt_gdtr);
-    realmode_setup();
+// void kernel_setup(void) {
+//     load_gdt(&_gdt_gdtr);
+//     realmode_setup();
 
-    load_gdt(&_gdt_gdtr);
+//     load_gdt(&_gdt_gdtr);
 
-    push_state();
-    // 4F02h : Set video mode, Mode : 117h
-    bios_10h_interrupt(0x4F02, 0x117 | 0x4000, 0, 0, 0);
-    pop_state();
+//     push_state();
+//     // 4F02h : Set video mode, Mode : 117h
+//     bios_10h_interrupt(0x4F02, 0x117 | 0x4000, 0, 0, 0);
+//     pop_state();
 
-    pic_remap();
-    initialize_idt();
-    keyboard_state_activate();
+//     pic_remap();
+//     initialize_idt();
+//     keyboard_state_activate();
 
-    bool inTitle = true;
-    (void)inTitle;
-    int row, col;
+//     bool inTitle = true;
+//     (void)inTitle;
+//     int row, col;
 
-    for(row = 0; row < GRAPHICS_HEIGHT; row++){
-        for(col = 0; col < GRAPHICS_WIDTH; col++){
-            draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
-        }
-    }
+//     for(row = 0; row < GRAPHICS_HEIGHT; row++){
+//         for(col = 0; col < GRAPHICS_WIDTH; col++){
+//             draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
+//         }
+//     }
 
-    while (inTitle){
-        char c;
-        get_keyboard_buffer(&c);
-        if (c == ' ') inTitle = false;
-    }
+//     while (inTitle){
+//         char c;
+//         get_keyboard_buffer(&c);
+//         if (c == ' ') inTitle = false;
+//     }
 
-    set_screen_color(BLACK);
+//     set_screen_color(BLACK);
 
-    int pos = 0;
-    row = pos / TEXT_WIDTH;
-    col = pos % TEXT_WIDTH;
-    while (true) {
-        char c;
-        get_keyboard_buffer(&c);
-        if (c) {
-            draw_char_at(c, row, col, WHITE, BLACK);
-            pos++;
-        }
-        row = pos / TEXT_WIDTH;
-        col = pos % TEXT_WIDTH;
+//     int pos = 0;
+//     row = pos / TEXT_WIDTH;
+//     col = pos % TEXT_WIDTH;
+//     while (true) {
+//         char c;
+//         get_keyboard_buffer(&c);
+//         if (c) {
+//             draw_char_at(c, row, col, WHITE, BLACK);
+//             pos++;
+//         }
+//         row = pos / TEXT_WIDTH;
+//         col = pos % TEXT_WIDTH;
 
-        draw_char_at('_', row, col, WHITE, BLACK);
-    }
-}
+//         draw_char_at('_', row, col, WHITE, BLACK);
+//     }
+// }
 
 
 

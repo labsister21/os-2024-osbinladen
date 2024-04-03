@@ -77,14 +77,14 @@ void create_fat32(void){
     write_clusters(driver_state.fat_table.cluster_map, FAT_CLUSTER_NUMBER, 1);
 
     struct FAT32DirectoryTable defaultRootTable = {0};
-    memcpy(defaultRootTable.table[0].name, "root", 8);
+    memcpy(defaultRootTable.table[0].name, ".", 8);
     defaultRootTable.table[0].attribute = ATTR_SUBDIRECTORY;
     defaultRootTable.table[0].user_attribute = UATTR_NOT_EMPTY;
     defaultRootTable.table[0].cluster_low = 0x2;
     defaultRootTable.table[0].cluster_high = 0x0;
     defaultRootTable.table[0].filesize = 0x0;
 
-    memcpy(defaultRootTable.table[1].name, "root", 8);
+    memcpy(defaultRootTable.table[1].name, "..", 8);
     defaultRootTable.table[1].attribute = ATTR_SUBDIRECTORY;
     defaultRootTable.table[1].user_attribute = UATTR_NOT_EMPTY;
     defaultRootTable.table[1].cluster_low = 0x2;
@@ -146,8 +146,8 @@ int8_t read(struct FAT32DriverRequest request){
         return -1;
     }
     uint32_t current_cluster_number = request.parent_cluster_number;
+    unsigned int i = 2;
     while(current_cluster_number != FAT32_FAT_END_OF_FILE && returnCode == 2){
-        unsigned int i = 2;
         while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0){
@@ -163,6 +163,7 @@ int8_t read(struct FAT32DriverRequest request){
             i++;
         }
         current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
+        i=0;
     }
     if(returnCode == 4)returnCode = 2;
     return returnCode;
@@ -175,8 +176,8 @@ int8_t read_directory(struct FAT32DriverRequest request){
         return -1;
     }
     uint32_t current_cluster_number = request.parent_cluster_number;
+    unsigned int i = 2;
     while(current_cluster_number != FAT32_FAT_END_OF_FILE && returnCode == 2){
-        unsigned int i = 2;
         while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY){
@@ -191,6 +192,7 @@ int8_t read_directory(struct FAT32DriverRequest request){
             i++;
         }
         current_cluster_number = driver_state.fat_table.cluster_map[current_cluster_number];
+        i=0;
     }
     if(returnCode == 4)returnCode = 2;
     return returnCode;
