@@ -26,7 +26,7 @@ static struct FAT32DriverState driver_state = {0};
  * @param parent_dir_cluster Parent directory cluster number
  */
 void init_directory_table(struct FAT32DirectoryTable *dir_table, char *name, uint32_t parent_dir_cluster){
-    memcpy(dir_table->table[0].name, name, 1);
+    memcpy(dir_table->table[0].name, name, 8);
     uint32_t empty_cluster = get_empty_cluster();
 
     dir_table->table[0].attribute = ATTR_SUBDIRECTORY;
@@ -238,9 +238,9 @@ int8_t write(struct FAT32DriverRequest request){
     }
 
     uint32_t clusterNeeded = ((request.buffer_size)% CLUSTER_SIZE) == 0 ? ((request.buffer_size)/ CLUSTER_SIZE): ((request.buffer_size)/ CLUSTER_SIZE) +1;
-
-
-   
+    if (clusterNeeded <= 0){
+        clusterNeeded = 1;
+    }
 
     uint32_t start_cluster = get_empty_cluster();
     if((int)start_cluster == -1){
@@ -261,6 +261,8 @@ int8_t write(struct FAT32DriverRequest request){
         driver_state.dir_table_buf.table[entry_num] = new_entry;
 
         struct FAT32DirectoryTable new_dir_table = {0};
+
+        driver_state.fat_table.cluster_map[start_cluster] = FAT32_FAT_END_OF_FILE;
         init_directory_table(&new_dir_table,request.name,request.parent_cluster_number);
         write_clusters(&new_dir_table,start_cluster,1);
         write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
@@ -278,8 +280,11 @@ int8_t write(struct FAT32DriverRequest request){
             driver_state.fat_table.cluster_map[start_cluster] = next_cluster;
             uint32_t offset = CLUSTER_SIZE*(i);
             write_clusters(request.buf + offset , next_cluster,1);
+            driver_state.fat_table.cluster_map[start_cluster] = next_cluster;
             start_cluster = next_cluster;
         }
+
+        driver_state.fat_table.cluster_map[start_cluster] = FAT32_FAT_END_OF_FILE;
         write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
         write_clusters(&driver_state.fat_table, FAT_CLUSTER_NUMBER, 1);
     }

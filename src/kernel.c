@@ -104,7 +104,7 @@ void kernel_setup(void) {
 
     initialize_filesystem_fat32();
 
-    char* buf;
+    char buf[1];
 
     struct FAT32DriverRequest req = {
         buf,
