@@ -90,16 +90,32 @@
 
 
 void kernel_setup(void) {
+    realmode_setup();
     load_gdt(&_gdt_gdtr);
+
+    push_state();
+    // 4F02h : Set video mode, Mode : 117h
+    bios_10h_interrupt(0x4F02, 0x117 | 0x4000, 0, 0, 0);
+    pop_state();
+
     pic_remap();
     activate_keyboard_interrupt();
     initialize_idt();
-    framebuffer_clear();
-    framebuffer_set_cursor(0, 0);
 
-    struct BlockBuffer b;
-    for (int i = 0; i < 512; i++) b.buf[i] = i % 16;
-    write_blocks(&b, 17, 1);
+    initialize_filesystem_fat32();
+
+    char* buf;
+
+    struct FAT32DriverRequest req = {
+        buf,
+        {'f', 'o', 'n', 'd', 0x0, 0x0, 0x0, 0x0},
+        {0x0, 0x0, 0x0},
+        2,
+        0
+    };
+
+    write(req);
+
     while (true);
 }
 

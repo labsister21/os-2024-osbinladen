@@ -26,7 +26,7 @@ static struct FAT32DriverState driver_state = {0};
  * @param parent_dir_cluster Parent directory cluster number
  */
 void init_directory_table(struct FAT32DirectoryTable *dir_table, char *name, uint32_t parent_dir_cluster){
-    memcpy(dir_table->table[0].name, ".", 1);
+    memcpy(dir_table->table[0].name, name, 1);
     uint32_t empty_cluster = get_empty_cluster();
 
     dir_table->table[0].attribute = ATTR_SUBDIRECTORY;
@@ -135,7 +135,7 @@ void read_clusters(void *ptr, uint32_t cluster_number, uint8_t cluster_count){
 }
 
 void copy_long_cluster(void* target,int fileClusterNumber){
-    read_clusters(target,fileClusterNumber,1);
+    read_clusters(target, fileClusterNumber, 1);
     if(driver_state.fat_table.cluster_map[fileClusterNumber] != FAT32_FAT_END_OF_FILE){
         copy_long_cluster(target+CLUSTER_SIZE,driver_state.fat_table.cluster_map[fileClusterNumber]);
     }
@@ -154,7 +154,8 @@ int8_t read(struct FAT32DriverRequest request){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0){
                     returnCode = 0;
-                    copy_long_cluster(request.buf,i);
+                    copy_long_cluster(request.buf, (unsigned int)driver_state.dir_table_buf.table[i].cluster_low
+                    | (unsigned int)driver_state.dir_table_buf.table[i].cluster_low);
                 }
                 else returnCode = 1;
                 

@@ -1,5 +1,4 @@
-break interrupt.c:40
-break interrupt.c:54
-break kernel.c:145
+break fat32.c:159
+break kernel.c:117
 
 set exec-wrapper logging enabled
