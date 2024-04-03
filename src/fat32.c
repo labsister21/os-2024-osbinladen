@@ -132,6 +132,13 @@ void read_clusters(void *ptr, uint32_t cluster_number, uint8_t cluster_count){
     read_blocks(ptr, cluster_to_lba(cluster_number), cluster_count*CLUSTER_BLOCK_COUNT);
 }
 
+void copy_long_cluster(void* target,int fileClusterNumber){
+    read_clusters(target,fileClusterNumber,1);
+    if(driver_state.fat_table.cluster_map[fileClusterNumber] != FAT32_FAT_END_OF_FILE){
+        copy_long_cluster(target+CLUSTER_SIZE,driver_state.fat_table.cluster_map[fileClusterNumber]);
+    }
+}
+
 int8_t read(struct FAT32DriverRequest request){
     uint8_t returnCode = 2;
     read_clusters(driver_state.dir_table_buf.table,request.parent_cluster_number,1);
@@ -143,8 +150,10 @@ int8_t read(struct FAT32DriverRequest request){
         unsigned int i = 2;
         while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
-                if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0)
+                if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0){
                     returnCode = 0;
+                    copy_long_cluster(request.buf,i);
+                }
                 else returnCode = 1;
                 
             }
@@ -170,8 +179,10 @@ int8_t read_directory(struct FAT32DriverRequest request){
         unsigned int i = 2;
         while (i<CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && returnCode == 2){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
-                if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY)
+                if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY){
                     returnCode = 0;
+                    copy_long_cluster(request.buf,i);
+                }
                 else returnCode = 1;
                 if(driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY){
                     returnCode = 4;
