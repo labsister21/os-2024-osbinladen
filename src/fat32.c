@@ -307,7 +307,7 @@ int8_t delete(struct FAT32DriverRequest request){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 unsigned int fatnum = ((unsigned int)driver_state.dir_table_buf.table[i].cluster_low
                 | ((unsigned int)driver_state.dir_table_buf.table[i].cluster_high << 16));
-                if ((driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY) && (request.ext[0]= 0)){
+                if ((driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY) && (request.ext[0]== 0)){
                     if(is_folder_empty(fatnum)){
                         struct ClusterBuffer empty_cluster = {0};
                         write_clusters(&empty_cluster, fatnum, 1);
@@ -347,6 +347,45 @@ int8_t delete(struct FAT32DriverRequest request){
     
     return returnCode;
 }
+
+// ini gatau bener ato ga jadi perbandingan ?!
+// int8_t delete(struct FAT32DriverRequest request){
+//     uint8_t returnCode = 1;
+//     read_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
+//     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY){
+//         return -1;
+//     }
+//
+//     for (unsigned int i = 2; i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry); i++){
+//         if (memcmp(driver_state.dir_table_buf.table[i].name, request.name, 8) == 0){
+//             if ((driver_state.dir_table_buf.table[i].attribute & ATTR_SUBDIRECTORY) && 
+//                 (request.ext[0] == 0)) { 
+//                 if (!is_folder_empty(driver_state.dir_table_buf.table[i].cluster_low |
+//                                      (driver_state.dir_table_buf.table[i].cluster_high << 16))) {
+//                     return 2; 
+//                 }
+//             }
+//         
+//             if (memcmp(driver_state.dir_table_buf.table[i].ext, request.ext, 3) == 0 ||
+//                 (driver_state.dir_table_buf.table[i].attribute & ATTR_SUBDIRECTORY)) {
+//                 uint32_t cluster_num = driver_state.dir_table_buf.table[i].cluster_low | (driver_state.dir_table_buf.table[i].cluster_high << 16);
+//          
+//                 while (cluster_num != FAT32_FAT_END_OF_FILE) {
+//                     uint32_t next_cluster = driver_state.fat_table.cluster_map[cluster_num];
+//                     driver_state.fat_table.cluster_map[cluster_num] = FAT32_FAT_EMPTY_ENTRY;
+//                     cluster_num = next_cluster;
+//                 }
+//
+//                 memset(&driver_state.dir_table_buf.table[i], 0, sizeof(struct FAT32DirectoryEntry));
+//                 write_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
+//                 write_clusters(&driver_state.fat_table, FAT_CLUSTER_NUMBER, 1);
+//
+//                 return 0;
+//             }
+//         }
+//     }
+//     return returnCode;
+// }
 
 bool is_folder_empty(uint32_t parent_cluster_number){
     read_clusters(driver_state.dir_table_buf.table, parent_cluster_number, 1);
