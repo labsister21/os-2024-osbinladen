@@ -253,4 +253,7 @@ int8_t delete(struct FAT32DriverRequest request);
 
 uint32_t get_empty_cluster();
 
+int get_last_index(uint32_t cluster_number);
+bool is_folder_empty(uint32_t parent_cluster_number);
+
 #endif
