@@ -35,11 +35,11 @@ struct KeyboardDriverState {
     bool read_extended_mode;
     bool keyboard_input_on;
     char keyboard_buffer[TEXT_SIZE];
-    uint8_t buffer_index;
+    uint16_t buffer_index;
 
 } __attribute((packed));
 
-
+extern struct KeyboardDriverState keyboard_state;
 
 
 
@@ -63,5 +63,6 @@ void get_keyboard_buffer(char *buf);
 void keyboard_isr(void);
 int get_cursor_pos();
 char get_char_buffer_at(int idx);
+void reset_keyboard_buffer();
 
 #endif

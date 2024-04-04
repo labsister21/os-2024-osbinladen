@@ -36,6 +36,12 @@ int text_col_to_pixel_col(int col){
 
 void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg){
     int x, y;
+
+    if (c < 32 || c > 126){
+        draw_null_char(row, column, bg);
+        return;
+    }
+    
     for(y = 0; y < 16; y++){
         for(x = 0; x < 8; x++){
             if (((font8x16[(int)c * 16 + y] >> x) & 1) == 1){
@@ -52,6 +58,19 @@ void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg){
                     bg
                 );
             }
+        }
+    }
+}
+
+void draw_null_char(int row, int column, Color16 bg){
+    int x, y;
+    for(y = 0; y < 16; y++){
+        for(x = 0; x < 8; x++){
+            draw_pixel_at(
+                text_row_to_pixel_row(row) + y,
+                text_col_to_pixel_col(column) + 7 - x,
+                bg
+            );
         }
     }
 }

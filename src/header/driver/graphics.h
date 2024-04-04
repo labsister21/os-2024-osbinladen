@@ -12,6 +12,7 @@
 #define PIXEL_SIZE 2
 #define TEXT_WIDTH (GRAPHICS_WIDTH/8)
 #define TEXT_HEIGHT (GRAPHICS_HEIGHT/16)
+#define TEXT_SIZE (TEXT_WIDTH * TEXT_HEIGHT)
 
 #define BLACK (Color16){0, 0, 0}
 #define BLUE (Color16){0b11111, 0, 0}
@@ -41,5 +42,6 @@ void draw_pixel_at_with_code(int row, int column, uint16_t color);
 void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg);
 int row_pos_to_pixel_row(int row);
 int col_pos_to_pixel_col(int col);
+void draw_null_char(int row, int column, Color16 bg);
 
 #endif
