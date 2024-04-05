@@ -144,36 +144,55 @@ void kernel_setup(void) {
     initialize_idt();
     keyboard_state_activate();
 
-    int row, col;
-    int last_pos = 0;
+    // int row, col;
+    // int last_pos = 0;
 
-    for(row = 0; row < GRAPHICS_HEIGHT; row++){
-        for(col = 0; col < GRAPHICS_WIDTH; col++){
-            draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
-        }
-    }
+    // for(row = 0; row < GRAPHICS_HEIGHT; row++){
+    //     for(col = 0; col < GRAPHICS_WIDTH; col++){
+    //         draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
+    //     }
+    // }
 
-    while (true){
-            while (keyboard_state.buffer_index != last_pos){
-            if (keyboard_state.keyboard_buffer[last_pos] == ' '){
-                goto escape;
-            }
-            last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
-        }
-    }
-    escape:
-    reset_keyboard_buffer();
-    last_pos = 0;
+    // while (true){
+    //         while (keyboard_state.buffer_index != last_pos){
+    //         if (keyboard_state.keyboard_buffer[last_pos] == ' '){
+    //             goto escape;
+    //         }
+    //         last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
+    //     }
+    // }
+
+    // escape:
+    // reset_keyboard_buffer();
+    // last_pos = 0;
 
     set_screen_color(BLACK);
 
-    while(true){
-        draw_char_at('_', keyboard_state.buffer_index / TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
-        while (keyboard_state.buffer_index != last_pos){
-            draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, WHITE, BLACK);
-            last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
-        }
-    }
+    // while(true){
+    //     draw_char_at('_', keyboard_state.buffer_index / TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
+    //     while (keyboard_state.buffer_index != last_pos){
+    //         draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, WHITE, BLACK);
+    //         last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
+    //     }
+    // }
+
+    initialize_filesystem_fat32();
+
+    char buf[1];
+
+    struct FAT32DriverRequest req = {
+        buf,
+        {'f', 'o', 'l', 'd', 'e', 'r', '2', 0x0},
+        {0x0, 0x0, 0x0},
+        0x02,
+        0
+    };
+
+    char a = delete(req);
+    
+    int y = 1 + 1;
+    (void)y;
+    (void)a;
 }
 
 

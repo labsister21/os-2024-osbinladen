@@ -305,6 +305,7 @@ bool is_folder_empty(uint32_t parent_cluster_number) {
     return true;
 }
 
+uint8_t get_dir_last_index();
 
 int8_t delete(struct FAT32DriverRequest request) {
     read_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
@@ -348,7 +349,7 @@ int8_t delete(struct FAT32DriverRequest request) {
         }
     }
 
-    uint32_t cluster_number = (driver_state.dir_table_buf.table[index].cluster_high << 16) |
+    uint32_t cluster_number = ((uint32_t)driver_state.dir_table_buf.table[index].cluster_high << 16) |
                               (driver_state.dir_table_buf.table[index].cluster_low);
     uint8_t empty_cluster[CLUSTER_SIZE];
     memset(empty_cluster, 0, CLUSTER_SIZE);
@@ -359,7 +360,21 @@ int8_t delete(struct FAT32DriverRequest request) {
         cluster_number = next_cluster;
     }
 
-    memset(&driver_state.dir_table_buf.table[index], 0, sizeof(struct FAT32DirectoryEntry));
+    uint8_t last_idx = get_dir_last_index();
+    driver_state.dir_table_buf.table[index] = driver_state.dir_table_buf.table[last_idx];
+    memset(&(driver_state.dir_table_buf.table[last_idx]), 0x0, sizeof(struct FAT32DirectoryEntry));
     write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
     return 0;
+}
+
+uint8_t get_dir_last_index(){
+    unsigned int i = 2; 
+    while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry)) {
+        if (driver_state.dir_table_buf.table[i].user_attribute != UATTR_NOT_EMPTY) {
+            return i - 1;
+        } else {
+            i++;
+        }
+    }
+    return -1;
 }
