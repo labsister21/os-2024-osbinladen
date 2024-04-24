@@ -75,7 +75,7 @@ struct PageDirectoryEntry {
 struct PageDirectory {
     // TODO : Implement
     struct PageDirectoryEntry table[PAGE_ENTRY_COUNT];
-} __attribute__((aligned(0x1000)));
+} __attribute__((aligned(0x1000))) __attribute__((packed));
 
 /**
  * Containing page manager states.
