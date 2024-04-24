@@ -14,6 +14,7 @@
         "fat32.h": "c",
         "libc-header-start.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stddef.h": "c"
     },
 }
