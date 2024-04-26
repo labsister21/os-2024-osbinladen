@@ -136,6 +136,11 @@ void kernel_setup(void) {
     pic_remap();
     initialize_idt();
     keyboard_state_activate();
+    initialize_filesystem_fat32();
+    gdt_install_tss();
+    set_tss_register();
+
+    paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
 
     int row, col;
     int last_pos = 0;
@@ -161,13 +166,21 @@ void kernel_setup(void) {
 
     set_screen_color(BLACK);
 
-    while(true){
-        draw_char_at('_', keyboard_state.buffer_index / TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
-        while (keyboard_state.buffer_index != last_pos){
-            draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, WHITE, BLACK);
-            last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
-        }
-    }
+    struct FAT32DriverRequest request = {
+        .buf                   = (uint8_t*) 0,
+        .name                  = "shell",
+        .ext                   = "\0\0\0",
+        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
+        .buffer_size           = 0x100000,
+    };
+    read(request);
+
+    // Set TSS $esp pointer and jump into shell 
+    set_tss_kernel_current_stack();
+    kernel_execute_user_program((uint8_t*) 0);
+
+    while (true);
+}
 
 //     // int row, col;
 //     // int last_pos = 0;
