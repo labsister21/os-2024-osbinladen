@@ -46,6 +46,7 @@ save_state:
     dd 0                ; esi
     dd 0                ; edi
     dd 0                ; flags
+    dd 0                ; cr0
 
 save_status:
     dw 0
@@ -56,6 +57,10 @@ bits 32
 section .text
 
 push_state:
+
+    mov eax, cr0
+    and eax, 0x7FFFFFFF
+    mov cr0, eax
 
     ; Save registers
     mov [save_state], eax
@@ -71,6 +76,10 @@ push_state:
     mov [save_state + 24], eax
     popf
 
+    ; save cr0
+    mov eax, cr0
+    mov [save_state + 28], eax
+
     ; return eax value
     mov eax, [save_state]
 
@@ -80,8 +89,6 @@ bios_10h_interrupt:
 
     ; disable interrupt (step 1)
     cli
-
-    ; Paging is disabled (step 2 skipped)
 
     ; Save call args
     mov ax, [esp + 4]
@@ -173,11 +180,10 @@ done:
     mov eax,cr0
     inc eax
     mov cr0,eax
-    jmp dword CODE32SEL:return_to_prot
+    jmp dword CODE32SEL:(return_to_prot - 0xC0000000)
 
 bits 32
-section .text
-
+section .setup.text
 return_to_prot:
 
     mov eax, DATA32SEL
@@ -194,6 +200,11 @@ return_to_prot:
     ret
 
 pop_state:
+
+    ; set cr0 first
+    mov eax, [save_state + 28]
+    mov cr0, eax
+
     ; go to past data
     mov eax, [save_state]
     mov ecx, [save_state + 4]

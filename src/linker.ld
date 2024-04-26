@@ -1,16 +1,21 @@
-ENTRY(loader);
+ENTRY(loader)                /* the name of the entry label */
+/* Relocation address 0xC0010000, but load address (physical location) 0x100000 */
 
-/* Multiboot spec uses 0x00100000 as a base */
-PHYS_BASE = 0x00100000;
+/* Real mode loads at 0x00001000 */
 REAL_BASE = 0x00001000;
+KERNEL_OFFSET = 0xC0000000;
 
-SECTIONS
-{
-    . = PHYS_BASE;
+SECTIONS {
+    . = 0xC0100000;          /* use relocation address at 0xC0100000 */
+    /* Linker variable that can be used in kernel */
+    _linker_kernel_virtual_addr_start  = .; 
+    _linker_kernel_physical_addr_start = . - 0xC0000000; 
+    .multiboot ALIGN (0x1000) : AT (ADDR (.multiboot) - 0xC0000000) {
+        *(.multiboot)        /* put GRUB multiboot header at front */
+    }
 
-    /* Place the multiboot record first */
-    .multiboot : {
-        *(.multiboot);
+    .setup.text ALIGN (0x1000) : AT (ADDR (.setup.text) - 0xC0000000) {
+        *(.setup.text)       /* initial setup code */
     }
 
     /* This is the tricky part. The LMA (load memory address) is the
@@ -28,7 +33,7 @@ SECTIONS
      */
 
     __physreal_diff = . - REAL_BASE;
-    .realmode REAL_BASE : AT(ADDR(.realmode) + __physreal_diff) {
+    .realmode REAL_BASE : AT(ADDR(.realmode) + __physreal_diff - KERNEL_OFFSET) {
         /* The __realmode* values can be used by code to copy
          * the code/data from where it was placed in RAM by the
          * multiboot loader into lower memory at REAL_BASE
@@ -45,7 +50,7 @@ SECTIONS
     __realmode_vma_end = .;
     __realmode_secsize   = ((__realmode_vma_end)-(__realmode_vma_start));
     __realmode_secsize_l = __realmode_secsize>>2;
-    __realmode_lma_end   = __realmode_vma_start + __physreal_diff + __realmode_secsize;
+    __realmode_lma_end   = __realmode_vma_start + __physreal_diff + __realmode_secsize - KERNEL_OFFSET;
 
     /* . (period) is the current VMA. We set it to the value that would
      * have been generated had we not changed the VMA in the previous
@@ -53,42 +58,26 @@ SECTIONS
      * AT(ADDR(.text))
      */
     . += __physreal_diff;
-    .text ALIGN(4K): AT(ADDR(.text)) {
-        *(.text);
+
+    .text ALIGN (0x1000) : AT (ADDR (.text) - 0xC0000000) {
+        *(.text)             /* all text sections from all files */
     }
 
-    /* From this point the linker script is typical */
-    .data ALIGN(4K) : {
-        *(.data);
+    .rodata ALIGN (0x1000) : AT (ADDR (.rodata) - 0xC0000000) {
+        *(.rodata*)          /* all read-only data sections from all files */
     }
 
-    .data ALIGN(4K) : {
-        *(.rodata);
+    .data ALIGN (0x1000) : AT (ADDR (.data) - 0xC0000000) {
+        *(.data)             /* all data sections from all files */
     }
 
-    /* We want to avoid this section being placed in low memory */
-    .eh_frame : {
-        *(.eh_frame*);
+    .bss ALIGN (0x1000) : AT (ADDR (.bss) - 0xC0000000) {
+        *(COMMON)            /* all COMMON sections from all files */
+        *(.bss)              /* all bss sections from all files */
+        [a-z\/]*kernel-entrypoint.o(.bss)
+        _linker_kernel_stack_top = .;
     }
-
-    .bss ALIGN(4K): {
-        *(COMMON);
-        *(.bss)
-    }
-
-    /* The .note.gnu.build-id section will usually be placed at the beginning
-     * of the ELF object. We discard it (if it is present) so that the
-     * multiboot header is placed as early as possible in the file. The
-     * multiboot header must appear in the first 8K and be on a 4 byte
-     * aligned offset per the multiboot spec.
-     */
-    /DISCARD/ : {
-        *(.note.gnu.build-id);
-        *(.comment);
-    }
+    /* Linker variable that can be used in kernel */
+    _linker_kernel_virtual_addr_end  = .;
+    _linker_kernel_physical_addr_end = . - 0xC0000000;
 }
-
-/*
-* Linker script taken from this stackoverflow thread:
-* https://stackoverflow.com/questions/41563879/ld-errors-while-linking-16-bit-real-mode-code-into-a-multiboot-compliant-elf-exe
-*/

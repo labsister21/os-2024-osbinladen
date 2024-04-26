@@ -130,20 +130,44 @@
 //     }
 // }
 
-// void kernel_setup(void) {
-//     load_gdt(&_gdt_gdtr);
-//     realmode_setup();
+void kernel_setup(void) {
+    load_gdt(&_gdt_gdtr);
 
-//     load_gdt(&_gdt_gdtr);
+    pic_remap();
+    initialize_idt();
+    keyboard_state_activate();
 
-//     push_state();
-//     // 4F02h : Set video mode, Mode : 117h
-//     bios_10h_interrupt(0x4F02, 0x117 | 0x4000, 0, 0, 0);
-//     pop_state();
+    int row, col;
+    int last_pos = 0;
 
-//     pic_remap();
-//     initialize_idt();
-//     keyboard_state_activate();
+    for(row = 0; row < GRAPHICS_HEIGHT; row++){
+        for(col = 0; col < GRAPHICS_WIDTH; col++){
+            draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
+        }
+    }
+
+    while (true){
+            while (keyboard_state.buffer_index != last_pos){
+            if (keyboard_state.keyboard_buffer[last_pos] == ' '){
+                goto escape;
+            }
+            last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
+        }
+    }
+
+    escape:
+    reset_keyboard_buffer();
+    last_pos = 0;
+
+    set_screen_color(BLACK);
+
+    while(true){
+        draw_char_at('_', keyboard_state.buffer_index / TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
+        while (keyboard_state.buffer_index != last_pos){
+            draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, WHITE, BLACK);
+            last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
+        }
+    }
 
 //     // int row, col;
 //     // int last_pos = 0;
@@ -200,33 +224,33 @@
 
 
 
-void kernel_setup(void) {
-    load_gdt(&_gdt_gdtr);
-    pic_remap();
-    initialize_idt();
-    activate_keyboard_interrupt();
-    // framebuffer_clear();
-    // framebuffer_set_cursor(0, 0);
-    initialize_filesystem_fat32();
-    gdt_install_tss();
-    set_tss_register();
+// void kernel_setup(void) {
+//     load_gdt(&_gdt_gdtr);
+//     pic_remap();
+//     initialize_idt();
+//     activate_keyboard_interrupt();
+//     // framebuffer_clear();
+//     // framebuffer_set_cursor(0, 0);
+//     initialize_filesystem_fat32();
+//     gdt_install_tss();
+//     set_tss_register();
 
-    // Allocate first 4 MiB virtual memory
-    paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
+//     // Allocate first 4 MiB virtual memory
+//     paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
 
-    // Write shell into memory
-    struct FAT32DriverRequest request = {
-        .buf                   = (uint8_t*) 0,
-        .name                  = "shell",
-        .ext                   = "\0\0\0",
-        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
-        .buffer_size           = 0x100000,
-    };
-    read(request);
+//     // Write shell into memory
+//     struct FAT32DriverRequest request = {
+//         .buf                   = (uint8_t*) 0,
+//         .name                  = "shell",
+//         .ext                   = "\0\0\0",
+//         .parent_cluster_number = ROOT_CLUSTER_NUMBER,
+//         .buffer_size           = 0x100000,
+//     };
+//     read(request);
 
-    // Set TSS $esp pointer and jump into shell 
-    set_tss_kernel_current_stack();
-    kernel_execute_user_program((uint8_t*) 0);
+//     // Set TSS $esp pointer and jump into shell 
+//     set_tss_kernel_current_stack();
+//     kernel_execute_user_program((uint8_t*) 0);
 
-    while (true);
-}
+//     while (true);
+// }

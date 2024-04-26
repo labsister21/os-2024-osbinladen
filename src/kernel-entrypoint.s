@@ -1,6 +1,8 @@
 global loader                        ; the entry symbol for ELF
 global load_gdt                      ; load GDT table
 global set_tss_register              ; set tss register to GDT entry
+extern realmode_setup                ; aiyyo it's my thing
+extern bios_10h_interrupt            ; self explanatory name oke
 extern kernel_setup                  ; kernel C entrypoint
 extern _paging_kernel_page_directory ; kernel page directory
 
@@ -28,6 +30,16 @@ align 4             ; the code must be 4 byte aligned
 section .setup.text 
 loader equ (loader_entrypoint - KERNEL_VIRTUAL_BASE)
 loader_entrypoint:         ; the loader label (defined as entry point in linker script)
+
+    call realmode_setup
+
+    push 0x0
+    push 0x0
+    push 0x0
+    push 0x4117
+    push 0x4f02
+    call bios_10h_interrupt
+
     ; Set CR3 (CPU page register)
     mov eax, _paging_kernel_page_directory - KERNEL_VIRTUAL_BASE
     mov cr3, eax
@@ -109,4 +121,3 @@ set_tss_register:
     mov ax, 0x28 | 0 ; GDT TSS Selector, ring 0
     ltr ax
     ret
-

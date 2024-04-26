@@ -1,7 +1,0 @@
-break fat32.c:159
-break fat32.c:239
-break fat32.c:351
-break kernel.c:191
-break kernel.c:193
-
-set exec-wrapper logging enabled

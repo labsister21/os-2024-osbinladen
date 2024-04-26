@@ -55,6 +55,7 @@ struct GlobalDescriptorTable global_descriptor_table = {
             1, //g
             0 //base high
         },
+<<<<<<< Updated upstream
         {
             /* User Code Descriptor */
             0xFFFF, //segment low
@@ -105,6 +106,9 @@ struct GlobalDescriptorTable global_descriptor_table = {
 
         // for 16 bit protected mode
         {
+=======
+        { // 16 bit protected mode code
+>>>>>>> Stashed changes
             0xFFFF, //segment low
             0, //base low
             0, //base mid
@@ -119,7 +123,7 @@ struct GlobalDescriptorTable global_descriptor_table = {
             0, // granularity 1
             0 //base high
         },
-        {
+        { // 16 bit protected mode data
             0xFFFF, //segment low
             0, //base low
             0, //base mid

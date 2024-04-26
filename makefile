@@ -9,7 +9,7 @@ OUTPUT_FOLDER = bin
 ISO_NAME      = OS2024
 
 # Flags
-WARNING_CFLAG = -Wall -Wextra -Werror
+WARNING_CFLAG = -Wall -Wextra
 DEBUG_CFLAG   = -fshort-wchar -g
 STRIP_CFLAG   = -nostdlib -fno-stack-protector -nostartfiles -fno-pie -nodefaultlibs -ffreestanding
 CFLAGS        = $(DEBUG_CFLAG) $(WARNING_CFLAG) $(STRIP_CFLAG) -m32 -c -I$(SOURCE_FOLDER)
@@ -21,6 +21,8 @@ DISK_NAME = storage
 disk:
 	@qemu-img create -f raw $(OUTPUT_FOLDER)/$(DISK_NAME).bin 4M
 
+debug: all
+	@qemu-system-i386 -s -S -drive file=bin/storage.bin,format=raw,if=ide,index=0,media=disk -cdrom bin/$(ISO_NAME).iso
 run: all
 	@qemu-system-i386 -s -drive file=bin/storage.bin,format=raw,if=ide,index=0,media=disk -cdrom bin/$(ISO_NAME).iso
 all: build
@@ -39,6 +41,7 @@ kernel:
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/disk.c -o $(OUTPUT_FOLDER)/disk.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/realModeGaming.c -o $(OUTPUT_FOLDER)/realModeGaming.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/graphics.c -o $(OUTPUT_FOLDER)/graphics.o
+	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/paging.c -o $(OUTPUT_FOLDER)/paging.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/fat32.c -o $(OUTPUT_FOLDER)/fat32.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/paging.c -o $(OUTPUT_FOLDER)/paging.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/intsetup.s -o $(OUTPUT_FOLDER)/intsetup.o

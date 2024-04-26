@@ -17,6 +17,32 @@ __attribute__((aligned(0x1000))) struct PageDirectory _paging_kernel_page_direct
             .flag.use_pagesize_4_mb = 1,
             .lower_address          = 0,
         },
+        // The Kernel doesn't fit in one page T_T
+        [0x301] = {
+            .flag.present_bit       = 1,
+            .flag.write_bit         = 1,
+            .flag.use_pagesize_4_mb = 1,
+            .lower_address          = 0x1,
+        },
+        // For VESA
+        [0x3F4] = {
+            .flag.present_bit       = 1,
+            .flag.write_bit         = 1,
+            .flag.use_pagesize_4_mb = 1,
+            .lower_address          = 0x3F4,
+        },
+        [0x3F5] = {
+            .flag.present_bit       = 1,
+            .flag.write_bit         = 1,
+            .flag.use_pagesize_4_mb = 1,
+            .lower_address          = 0x3F5,
+        },
+        [0x3F6] = {
+            .flag.present_bit       = 1,
+            .flag.write_bit         = 1,
+            .flag.use_pagesize_4_mb = 1,
+            .lower_address          = 0x3F6,
+        }
     }
 };
 
@@ -26,7 +52,7 @@ static struct PageManagerState page_manager_state = {
         [1 ... PAGE_FRAME_MAX_COUNT-1] = false
     },
     // TODO: Initialize page manager state properly
-    .free_page_frame_count = PAGE_FRAME_MAX_COUNT
+    .free_page_frame_count = PAGE_FRAME_MAX_COUNT - 1
 };
 
 void update_page_directory_entry(
