@@ -1,0 +1,6 @@
+break interrupt.c:42
+break interrupt.c:44
+break kernel.c:242
+catch throw
+
+set exec-wrapper logging enabled

@@ -36,6 +36,7 @@ struct KeyboardDriverState {
     bool keyboard_input_on;
     char keyboard_buffer[TEXT_SIZE];
     uint16_t buffer_index;
+    char char_buffer[1];
 
 } __attribute((packed));
 
@@ -64,5 +65,6 @@ void keyboard_isr(void);
 int get_cursor_pos();
 char get_char_buffer_at(int idx);
 void reset_keyboard_buffer();
+void key_handler(char c);
 
 #endif

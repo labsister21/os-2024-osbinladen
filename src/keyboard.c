@@ -27,7 +27,8 @@ struct KeyboardDriverState keyboard_state = {
     .read_extended_mode = false,
     .keyboard_input_on = false,
     .buffer_index = 0,
-    .keyboard_buffer = {0}
+    .keyboard_buffer = {0},
+    .char_buffer = {0}
 };
 // Activate keyboard ISR / start listen keyboard & save to buffer
 void keyboard_state_activate(void){
@@ -40,8 +41,8 @@ void keyboard_state_deactivate(void){
 }
 
 void get_keyboard_buffer(char *buf){
-  *buf = *(keyboard_state.keyboard_buffer);
-  keyboard_state.buffer_index = 0;
+  *buf = *(keyboard_state.char_buffer);
+  *(keyboard_state.char_buffer) = 0;
 }
 
 int next_row_index(int i){
@@ -61,7 +62,6 @@ char current_char(){
 void handle_newline();
 void handle_tab();
 void handle_backspace();
-void handle_others(char key);
 void handle_up_arrow();
 void handle_left_arrow();
 void handle_right_arrow();
@@ -158,9 +158,16 @@ void keyboard_isr(void) {
   else {
     uint8_t scancode = in(KEYBOARD_DATA_PORT);
     char key = keyboard_scancode_1_to_ascii_map[scancode];
+    *keyboard_state.char_buffer = key;
+  }
 
-    if (key != 0){
-      switch(key){
+  pic_ack(PIC1_OFFSET + IRQ_KEYBOARD);
+    // TODO : Implement scancode processing
+}
+
+void key_handler(char c){
+    if (c != 0){
+      switch(c){
         case '\n':
           handle_newline(); 
           break;   
@@ -171,12 +178,12 @@ void keyboard_isr(void) {
           handle_backspace();
           break;
         default:
-          handle_others(key);
+          handle_others(c);
           break;
       }
     }
     else{
-      switch(scancode){
+      switch(c){
         case EXT_SCANCODE_UP:
           handle_up_arrow();
           break;
@@ -191,10 +198,6 @@ void keyboard_isr(void) {
           break;
       }
     }
-  }
-
-  pic_ack(PIC1_OFFSET + IRQ_KEYBOARD);
-    // TODO : Implement scancode processing
 }
 
 void reset_keyboard_buffer(){

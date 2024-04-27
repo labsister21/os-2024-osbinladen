@@ -1,6 +1,8 @@
 #include "header/cpu/interrupt.h"
 #include "header/cpu/portio.h"
 #include "header/driver/keyboard.h"
+#include "header/driver/graphics.h"
+#include "header/filesystem/fat32.h"
 
 void io_wait(void) {
     out(0x80, 0);
@@ -41,6 +43,9 @@ void main_interrupt_handler(struct InterruptFrame frame) {
         case PIC1_OFFSET + IRQ_KEYBOARD:
             keyboard_isr();
             break;
+        case 0x30:
+            syscall(frame);
+            break;
     }
 }
 
@@ -68,4 +73,48 @@ void set_tss_kernel_current_stack(void) {
     __asm__ volatile ("mov %%ebp, %0": "=r"(stack_ptr) : /* <Empty> */);
     // Add 8 because 4 for ret address and other 4 is for stack_ptr variable
     _interrupt_tss_entry.esp0 = stack_ptr + 8; 
+}
+
+void syscall(struct InterruptFrame frame) {
+    switch (frame.cpu.general.eax) {
+        case 0:
+            *((int8_t*) frame.cpu.general.ecx) = read(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx)
+            );
+            break;
+        case 1:
+            *((int8_t*) frame.cpu.general.ecx) = read_directory(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx)
+            );
+            break;
+        case 2:
+            *((int8_t*) frame.cpu.general.ecx) = write(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx)
+            );
+            break;
+        case 3:
+            *((int8_t*) frame.cpu.general.ecx) = delete(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx)
+            );
+            break;
+        case 4:
+            get_keyboard_buffer((char*) frame.cpu.general.ebx);
+            break;
+        case 5:
+            putchar(frame.cpu.general.ebx, frame.cpu.general.ecx);
+            break;
+        case 6:
+            puts(
+                (char*) frame.cpu.general.ebx, 
+                frame.cpu.general.ecx, 
+                frame.cpu.general.edx
+            ); // Assuming puts() exist in kernel
+            break;
+        case 7: 
+            keyboard_state_activate();
+            break;
+        case 8:
+            draw_cursor();
+            break;
+    }
 }

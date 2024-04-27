@@ -1,6 +1,7 @@
 #include "header/interrupt/idt.h"
 #include "header/cpu/interrupt.h"
 #include "header/cpu/gdt.h"
+#include "header/filesystem/fat32.h"
 // #include "intsetup.s"
 
 struct InterruptDescriptorTable interrupt_descriptor_table = {
@@ -43,6 +44,12 @@ void initialize_idt(void) {
             0 // Kernel-level privilege
         );
     }
+    set_interrupt_gate(
+        0x30,
+        isr_stub_table[0x30],
+        GDT_KERNEL_CODE_SEGMENT_SELECTOR,
+        0x3   
+    );
 
     __asm__ volatile("lidt %0" : : "m"(_idt_idtr));
     __asm__ volatile("sti");

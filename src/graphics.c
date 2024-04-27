@@ -2,6 +2,9 @@
 #include "header/stdlib/string.h"
 #include "header/realModeGaming.h"
 #include "font/basicFont.h"
+#include "header/driver/keyboard.h"
+
+int last_pos = 0;
 
 void* word_memset(void *s, int c, size_t n) {
     uint16_t *buf = (uint16_t*) s;
@@ -16,6 +19,10 @@ void set_screen_color(Color16 color){
 
 uint16_t color_to_int(Color16 color){
     return color.red + (color.green << 5) + (color.blue << 11);
+}
+
+Color16 int_to_color(uint16_t color16){
+    return (Color16){color16 & 0b11111, (color16 >> 5) & 0b111111, (color16 >> 11) & 0b11111};
 }
 
 void draw_pixel_at(int row, int column, Color16 color){
@@ -73,4 +80,27 @@ void draw_null_char(int row, int column, Color16 bg){
             );
         }
     }
+}
+
+void buffered_draw(char c, Color16 fg, Color16 bg){
+    int last_pos = keyboard_state.buffer_index;
+    key_handler(c);
+    while (keyboard_state.buffer_index != last_pos){
+        draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, fg, bg);
+        last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
+    }
+}
+
+void putchar(char c, uint16_t textColor){
+    buffered_draw(c, int_to_color(textColor), BLACK);
+}
+
+void puts(char* buffer, int charCount, uint16_t textColor){
+    for(int i = 0; i < charCount; i++){
+        putchar(buffer[i], textColor);
+    }
+}
+
+void draw_cursor(){
+    draw_char_at('_', keyboard_state.buffer_index/TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
 }

@@ -34,6 +34,7 @@ typedef struct color24 {
 } RGBColor;
 
 uint16_t color_to_int(Color16 color);
+Color16 int_to_color(uint16_t Color16);
 void set_screen_color(Color16 color);
 void* word_memset(void *s, int c, size_t n);
 
@@ -43,5 +44,9 @@ void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg);
 int row_pos_to_pixel_row(int row);
 int col_pos_to_pixel_col(int col);
 void draw_null_char(int row, int column, Color16 bg);
+void buffered_draw(char c, Color16 fg, Color16 bg);
+void putchar(char c, uint16_t textColor);
+void puts(char* buffer, int charCount, uint16_t textColor);
+void draw_cursor();
 
 #endif
