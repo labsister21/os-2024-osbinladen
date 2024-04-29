@@ -2,16 +2,20 @@
 ASM           = nasm
 LIN           = ld
 CC            = gcc
+# LIN           = x86_64-elf-ld
+# CC            = x86_64-elf-gcc 
 
 # Directory
 SOURCE_FOLDER = src
 OUTPUT_FOLDER = bin
 ISO_NAME      = OS2024
+# ISO           = mkisofs
 
 # Flags
 WARNING_CFLAG = -Wall -Wextra
 DEBUG_CFLAG   = -fshort-wchar -g
 STRIP_CFLAG   = -nostdlib -fno-stack-protector -nostartfiles -fno-pie -nodefaultlibs -ffreestanding
+# STRIP_CFLAG   = -nostdlib -fno-stack-protector -nodefaultlibs -ffreestanding -mno-sse -mno-avx
 CFLAGS        = $(DEBUG_CFLAG) $(WARNING_CFLAG) $(STRIP_CFLAG) -m32 -c -I$(SOURCE_FOLDER)
 AFLAGS        = -f elf32 -g -F dwarf
 LFLAGS        = -T $(SOURCE_FOLDER)/linker.ld -melf_i386
@@ -58,6 +62,7 @@ iso: kernel
 	@cp other/grub1 $(OUTPUT_FOLDER)/iso/boot/grub/ 
 	@cp $(SOURCE_FOLDER)/menu.lst $(OUTPUT_FOLDER)/iso/boot/grub/
 	@genisoimage -R -b boot/grub/grub1 -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(OUTPUT_FOLDER)/OS2024.iso $(OUTPUT_FOLDER)/iso 
+	# @$(ISO) -R -b boot/grub/grub1 -no-emul-boot -boot-load-size 4 -A os -input-charset utf8 -quiet -boot-info-table -o $(OUTPUT_FOLDER)/OS2024.iso $(OUTPUT_FOLDER)/iso 
 	@rm -r $(OUTPUT_FOLDER)/iso/
 
 inserter:
