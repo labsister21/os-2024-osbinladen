@@ -116,5 +116,9 @@ void syscall(struct InterruptFrame frame) {
         case 8:
             draw_cursor();
             break;
+
+        case 9:
+            get_children((char* ) frame.cpu.general.ebx, frame.cpu.general.ecx);
+            break;
     }
 }

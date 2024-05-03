@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include "header/filesystem/fat32.h"
 
+
+uint32_t cwd_cluster_number = ROOT_CLUSTER_NUMBER;
+
+
 void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx) {
     __asm__ volatile("mov %0, %%ebx" : /* <Empty> */ : "r"(ebx));
     __asm__ volatile("mov %0, %%ecx" : /* <Empty> */ : "r"(ecx));
@@ -56,7 +60,11 @@ int cd(char* goal, int goalLength){
 * return 3: error lain
 */
 int ls(){
-    return 3;
+    char req_buf[BLOCK_SIZE*4];
+    // struct FAT32DirectoryTable dir_table;
+    syscall(9, (uint32_t) req_buf, cwd_cluster_number, 0);
+    syscall(6, (uint32_t) req_buf, req_buf, 0);
+
 }
 
 /*
@@ -136,3 +144,4 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
 int find(char* goal, int goalLength){
     return 3;
 }
+
