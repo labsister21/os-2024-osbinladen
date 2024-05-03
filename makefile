@@ -47,6 +47,7 @@ kernel:
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/graphics.c -o $(OUTPUT_FOLDER)/graphics.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/paging.c -o $(OUTPUT_FOLDER)/paging.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/fat32.c -o $(OUTPUT_FOLDER)/fat32.o
+	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/charframe.c -o $(OUTPUT_FOLDER)/charframe.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/paging.c -o $(OUTPUT_FOLDER)/paging.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/intsetup.s -o $(OUTPUT_FOLDER)/intsetup.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/asmGaming.s -o $(OUTPUT_FOLDER)/asmGaming.o
@@ -74,9 +75,13 @@ inserter:
 user-shell:
 	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/crt0.s -o crt0.o
 	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/user-shell.c -o user-shell.o
+	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/stdlib/string.c -o string.o
 	@$(LIN) -T $(SOURCE_FOLDER)/user-linker.ld -melf_i386 --oformat=binary \
-		crt0.o user-shell.o -o $(OUTPUT_FOLDER)/shell
+		crt0.o user-shell.o string.o -o $(OUTPUT_FOLDER)/shell
 	@echo Linking object shell object files and generate flat binary...
+	@$(LIN) -T $(SOURCE_FOLDER)/user-linker.ld -melf_i386 --oformat=elf32-i386 \
+		crt0.o user-shell.o string.o -o $(OUTPUT_FOLDER)/shell_elf
+	@echo Linking object shell object files and generate ELF32 for debugging...
 	@size --target=binary $(OUTPUT_FOLDER)/shell
 	@rm -f *.o
 

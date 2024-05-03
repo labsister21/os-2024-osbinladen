@@ -277,6 +277,7 @@ int8_t write(struct FAT32DriverRequest request){
         write_clusters(request.buf,start_cluster,1);
 
         for(uint32_t i = 1; i < clusterNeeded;i++){
+            driver_state.fat_table.cluster_map[start_cluster] = FAT32_FAT_END_OF_FILE;
             uint32_t next_cluster = get_empty_cluster();
             driver_state.fat_table.cluster_map[start_cluster] = next_cluster;
             uint32_t offset = CLUSTER_SIZE*(i);
@@ -286,6 +287,7 @@ int8_t write(struct FAT32DriverRequest request){
         }
 
         driver_state.fat_table.cluster_map[start_cluster] = FAT32_FAT_END_OF_FILE;
+
         write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
         write_clusters(&driver_state.fat_table, FAT_CLUSTER_NUMBER, 1);
     }

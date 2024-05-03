@@ -44,9 +44,5 @@ void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg);
 int row_pos_to_pixel_row(int row);
 int col_pos_to_pixel_col(int col);
 void draw_null_char(int row, int column, Color16 bg);
-void buffered_draw(char c, Color16 fg, Color16 bg);
-void putchar(char c, uint16_t textColor);
-void puts(char* buffer, int charCount, uint16_t textColor);
-void draw_cursor();
 
 #endif

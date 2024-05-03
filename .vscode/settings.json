@@ -15,6 +15,9 @@
         "libc-header-start.h": "c",
         "stdlib.h": "c",
         "stdio.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "keyboard.h": "c",
+        "charframe.h": "c",
+        "graphics.h": "c"
     },
 }

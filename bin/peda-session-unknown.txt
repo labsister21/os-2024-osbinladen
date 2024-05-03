@@ -1,4 +1,3 @@
-break kernel.c:241
 catch throw
 
 set exec-wrapper logging enabled

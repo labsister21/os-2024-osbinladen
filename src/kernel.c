@@ -233,10 +233,6 @@
 //     (void)a;
 // }
 
-
-
-
-
 void kernel_setup(void) {
     load_gdt(&_gdt_gdtr);
     pic_remap();
@@ -250,6 +246,17 @@ void kernel_setup(void) {
 
     // Allocate first 4 MiB virtual memory
     paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
+
+    // char code[0x1800];
+    // memset(code, 0x61, 0x1800);
+    // struct FAT32DriverRequest request = {
+    //     .buf         = code,
+    //     .ext         = "\0\0\0",
+    //     .buffer_size = 0x1800,
+    //     .parent_cluster_number = 2,
+    //     .name = "shell"
+    // };
+    // int retcode = write(request);
 
     // Write shell into memory
     struct FAT32DriverRequest request = {

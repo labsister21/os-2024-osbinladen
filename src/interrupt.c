@@ -3,6 +3,7 @@
 #include "header/driver/keyboard.h"
 #include "header/driver/graphics.h"
 #include "header/filesystem/fat32.h"
+#include "header/driver/charframe.h"
 
 void io_wait(void) {
     out(0x80, 0);

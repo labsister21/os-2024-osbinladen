@@ -109,7 +109,10 @@ bool paging_allocate_user_page_frame(struct PageDirectory *page_dir, void *virtu
         .user_supervisor_bit = 1,
         .use_pagesize_4_mb = 1,
     };
-    update_page_directory_entry(page_dir, (void*)(i*PAGE_FRAME_SIZE), virtual_addr, newFlag);
+
+    for(int j = 0; j < 16; j++){
+        update_page_directory_entry(page_dir, (void*)(i*PAGE_FRAME_SIZE) + j*2048, virtual_addr + j*2048, newFlag);
+    }
 
     return true;
 }
@@ -123,6 +126,6 @@ bool paging_free_user_page_frame(struct PageDirectory *page_dir, void *virtual_a
     uint32_t page_index = ((uint32_t) virtual_addr >> 22) & 0x3FF;
     uint32_t physical_index = page_dir->table[page_index].lower_address/PAGE_FRAME_SIZE;
     page_manager_state.page_frame_map[physical_index] = 0;
-    page_manager_state.free_page_frame_count--;
+    page_manager_state.free_page_frame_count++;
     return true;
 }

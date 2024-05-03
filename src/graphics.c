@@ -81,26 +81,3 @@ void draw_null_char(int row, int column, Color16 bg){
         }
     }
 }
-
-void buffered_draw(char c, Color16 fg, Color16 bg){
-    int last_pos = keyboard_state.buffer_index;
-    key_handler(c);
-    while (keyboard_state.buffer_index != last_pos){
-        draw_char_at(keyboard_state.keyboard_buffer[last_pos], last_pos/TEXT_WIDTH, last_pos % TEXT_WIDTH, fg, bg);
-        last_pos += (keyboard_state.buffer_index > last_pos) ? 1 : -1;
-    }
-}
-
-void putchar(char c, uint16_t textColor){
-    buffered_draw(c, int_to_color(textColor), BLACK);
-}
-
-void puts(char* buffer, int charCount, uint16_t textColor){
-    for(int i = 0; i < charCount; i++){
-        putchar(buffer[i], textColor);
-    }
-}
-
-void draw_cursor(){
-    draw_char_at('_', keyboard_state.buffer_index/TEXT_WIDTH, keyboard_state.buffer_index % TEXT_WIDTH, WHITE, BLACK);
-}
