@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "header/stdlib/string.h"
 #include "header/filesystem/fat32.h"
 
 
@@ -40,6 +41,11 @@ int main(void) {
     return 0;
 }
 
+
+void printToScreen(char msg [6144], uint8_t color){
+    syscall(6, (uint32_t) msg, (uint32_t) strlen(msg) , color);
+}
+
 /*
 * cd	- Mengganti current working directory
 * goal berisikan nama folder tujuan
@@ -75,8 +81,43 @@ int ls(){
 * return 1: directory penuh
 * return 3: error lain
 */
-int mkdir(char* goal, int goalLength){
-    return 3;
+int mkdir(char goal [6144], int goalLength){
+
+    struct ClusterBuffer temp = {0};
+    struct FAT32DriverRequest req = {
+        .buf                   = &temp,
+        .name                  = "\0\0\0\0",
+        .ext                   = "\0\0\0",
+        .parent_cluster_number = ROOT_CLUSTER_NUMBER,
+        .buffer_size           = 0,
+    };
+
+    if(memcmp(goal, "", 0)){
+        return 3;
+    }
+
+    uint8_t retcode;
+    syscall(2, (uint32_t) &req, (uint32_t) &retcode, 0);
+    char name[6144] = {0};
+    switch (retcode)
+    {
+    case 0:
+        /* folder doesn't exist, thus make folder */
+        char temp[8];
+        strncpy(temp, goal, 8);
+        strcat(name, "Folder \'");
+        strcat(name, temp);
+        strcat(name, "\' has been made");
+        
+        printToScreen("\n", 0xc);
+        printToScreen(name, 0xc);
+        break;
+    case 1:
+        /* folder already exists */
+        printToScreen("\n", 0xc);
+        printToScreen("A folder with the same name already exists", 0xa);
+        break;
+    }
 }
 
 /*
