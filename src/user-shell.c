@@ -35,3 +35,104 @@ int main(void) {
 
     return 0;
 }
+
+/*
+* cd	- Mengganti current working directory
+* goal berisikan nama folder tujuan
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah folder
+* return 2: Folder tidak ditemukan
+* return 3: error lain
+*/
+int cd(char* goal, int goalLength){
+    return 3;
+}
+
+/*
+* ls	- Menuliskan isi current working directory
+*
+* return 0: operasi berhasil
+* return 3: error lain
+*/
+int ls(){
+    return 3;
+}
+
+/*
+* mkdir	- Membuat sebuah folder kosong baru pada current working directory
+* goal berisikan nama folder yang ingin dibuat
+*
+* return 0: operasi berhasil
+* return 1: directory penuh
+* return 3: error lain
+*/
+int mkdir(char* goal, int goalLength){
+    return 3;
+}
+
+/*
+* cat	- Menuliskan sebuah file sebagai text file ke layar (Gunakan format LF newline)
+* goal berisikan nama file tujuan
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah file
+* return 2: File tidak ditemukan
+* return 3: error lain
+*/
+int cat(char* goal, int goalLength){
+    return 3;
+}
+
+/*
+* cp	- Mengcopy suatu file (Folder menjadi bonus)
+* goal berisikan nama file
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah file
+* return 2: File tidak ditemukan
+* return 3: error lain
+*/
+int cp(char* goal, int goalLength){
+    return 3;
+}
+
+/*
+* rm    - Menghapus suatu file (Folder menjadi bonus)
+* goal berisikan nama file
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah file
+* return 2: File tidak ditemukan
+* return 3: error lain
+*/
+int rm(char* goal, int goalLength){
+    return 3;
+}
+
+/*
+* mv	- Memindah dan merename lokasi file/folder
+* goal1 berisikan nama file tujuan
+* goal2 berisikan tujuan folder dan nama file baru setelah dipindah
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah file
+* return 2: file tidak ditemukan
+* return 3: folder tujuan tidak ada
+* return 4: error lain
+*/
+int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
+    return 3;
+}
+
+/*
+* find	- Mencari file/folder dengan nama yang sama diseluruh file system
+* goal berisikan nama file/folder yang dicari
+*
+* return 0: operasi berhasil
+* return 1: tujuan tidak ditemukan
+* return 3: error lain
+*/
+int find(char* goal, int goalLength){
+    return 3;
+}
