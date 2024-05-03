@@ -69,7 +69,7 @@ int ls(){
     char req_buf[BLOCK_SIZE*4];
     // struct FAT32DirectoryTable dir_table;
     syscall(9, (uint32_t) req_buf, cwd_cluster_number, 0);
-    syscall(6, (uint32_t) req_buf, req_buf, 0);
+    printToScreen(req_buf, 0x0);
 
 }
 
