@@ -1,8 +1,4 @@
-#include <stdint.h>
-#include "header/stdlib/string.h"
-#include "header/filesystem/fat32.h"
-#include "header/stdlib/string.h"
-#include "header/driver/graphics.h"
+#include "header/user-shell.h"
 
 void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 
@@ -92,8 +88,8 @@ void inputChar(char c){
     }
 }
 
-int ls();
 int mkdir(char *goal, int goalLength);
+int ls();
 
 int main(void) {
     struct ClusterBuffer      cl[4]   = {0};
@@ -112,6 +108,10 @@ int main(void) {
     char buffen;
     reset_user_buffer();
     syscall(7, 0, 0, 0);
+    mkdir("test", 4);
+    mkdir("crott", 5);
+    // printToScreen("cek",3);
+    ls();
     syscall(6, (uint32_t) "ha", 2, color_to_int(GREEN));
     while (true) {
         syscall(8, 0, 0, 0);
@@ -123,7 +123,10 @@ int main(void) {
 }
 
 
-void printToScreen(char* msg, uint8_t color){
+void printToScreen(char* msg, uint16_t color){
+    if(strlen(msg) == 2 && msg[0] == '\' ' && msg[1] == 'n'){
+         syscall(6, (uint32_t) "\n", 1 , color);
+    }
     syscall(6, (uint32_t) msg, (uint32_t) strlen(msg) , color);
 }
 
@@ -147,12 +150,38 @@ int cd(char* goal, int goalLength){
 * return 3: error lain
 */
 int ls(){
-    char req_buf[BLOCK_SIZE*4];
-    // struct FAT32DirectoryTable dir_table;
-    syscall(9, (uint32_t) req_buf, cwd_cluster_number, 0);
-    printToScreen(req_buf, 0xFF);
+    // print_cur_dir(cwd_cluster_number);
+    struct FAT32DirectoryTable dir_table;
+    syscall(10, cwd_cluster_number, &dir_table, 0);
+    print_cur_dir(dir_table);
     return 0;
 }
+
+
+void print_cur_dir(struct FAT32DirectoryTable dir_table){
+   
+    printToScreen("\n", color_to_int(WHITE));
+
+    for(int i = 1; i < 64; i++){
+        if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
+      
+                if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
+                    printToScreen(dir_table.table[i].name, color_to_int(BLUE));
+               
+                    printToScreen("    ", color_to_int(WHITE));
+                }
+                else{
+                    printToScreen(dir_table.table[i].name, color_to_int(WHITE));
+                    printToScreen(dir_table.table[i].ext, color_to_int(WHITE));
+                    printToScreen("    ", color_to_int(WHITE));
+
+                }
+            }
+     }
+    printToScreen("\n", color_to_int(WHITE));
+
+}
+
 
 /*
 * mkdir	- Membuat sebuah folder kosong baru pada current working directory
@@ -192,8 +221,10 @@ int mkdir(char *goal, int goalLength){
         strcat(name, goal);
         strcat(name, "\' has been made");
         
-        printToScreen("\n", 0xc);
-        printToScreen(name, 0xc);
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
         break;
     case 1:
         /* folder already exists */

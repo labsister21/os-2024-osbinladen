@@ -118,8 +118,8 @@ void syscall(struct InterruptFrame frame) {
             draw_cursor();
             break;
 
-        case 9:
-            get_children((char* ) frame.cpu.general.ebx, frame.cpu.general.ecx);
-            break;
+        case 10:
+            struct FAT32DirectoryTable *dir_table = (struct FAT32DirectoryTable *)frame.cpu.general.ecx;
+            get_curr_working_dir(frame.cpu.general.ebx, dir_table);
     }
 }

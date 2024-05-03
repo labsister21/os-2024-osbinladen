@@ -255,4 +255,6 @@ uint32_t get_empty_cluster();
 
 bool is_folder_empty(uint32_t parent_cluster_number);
 
+void get_curr_working_dir(uint32_t cur_cluster, struct FAT32DirectoryTable *dir_table);
+
 #endif
