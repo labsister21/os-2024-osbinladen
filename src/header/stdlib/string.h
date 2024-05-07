@@ -56,4 +56,6 @@ uint8_t strlen(char* str);
 
 void strcat(char* str1, char* str2);
 
+int isStrEqual(void* str1, void* str2);
+
 #endif

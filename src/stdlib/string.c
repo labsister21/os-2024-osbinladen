@@ -65,3 +65,7 @@ void strcat(char* str1, char* str2){
     }
     str1[i] = '\0';
 }
+
+int isStrEqual(void* str1, void* str2){
+    return memcmp(str1, str2, strlen(str1)) == 0;
+}

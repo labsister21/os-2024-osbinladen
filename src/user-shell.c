@@ -23,19 +23,37 @@ void reset_user_buffer(){
 }
 
 bool isBlank(char c){
-    return c != ' ' && c != '\n' && c != 0x0 && c != '\t';
+    return c == ' ' || c == '\n' || c == 0x0 || c == '\t';
 }
 
 void get_next_word(){
     memset(currentWord, 0, 64);
     int charPointer = 0;
+
+    while(isBlank(userBuffer[readPointer]) && userBuffer[readPointer] != 0x0){
+        readPointer++;
+    }
+
     while (!isBlank(userBuffer[readPointer])){
         currentWord[charPointer] = userBuffer[readPointer];
         charPointer++;
+        readPointer++;
     }
 }
 
 void cmdHandler(){
+    while(currentWord[0] != 0x0){
+        if (isStrEqual(currentWord, "ls")){
+            ls();
+        }
+        else if (isStrEqual(currentWord, "mkdir")){
+            mkdir()
+        }
+        else{
+            syscall(6, currentWord, strlen(currentWord), color_to_int(BLUE));
+        }
+        get_next_word();
+    }
     syscall(5, (uint32_t) '\n', color_to_int(WHITE), 0);
 }
 
@@ -43,9 +61,8 @@ void handle_newline(){
   userBuffer[userBufferPos] = ' ';
   userBufferPos++;
   get_next_word();
-  printToScreen(currentWord, color_to_int(GREEN));
   cmdHandler();
-  syscall(6, (uint32_t) "ha", 2, color_to_int(GREEN));
+  syscall(6, (uint32_t) "OS BIN lADEN ", 13, color_to_int(GREEN));
 }
 
 void handle_tab(){
@@ -106,12 +123,9 @@ int main(void) {
         syscall(6, (uint32_t) "owo\n", 4, color_to_int(GREEN));
 
     char buffen;
+    int i = cwd_cluster_number;
     reset_user_buffer();
     syscall(7, 0, 0, 0);
-    mkdir("test", 4);
-    mkdir("crott", 5);
-    // printToScreen("cek",3);
-    ls();
     syscall(6, (uint32_t) "ha", 2, color_to_int(GREEN));
     while (true) {
         syscall(8, 0, 0, 0);

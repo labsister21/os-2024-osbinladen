@@ -1,21 +1,35 @@
+UNAME := $(shell uname -s)
+
 # Compiler & linker
 ASM           = nasm
-LIN           = ld
-CC            = gcc
-# LIN           = x86_64-elf-ld
-# CC            = x86_64-elf-gcc 
+
+ifeq ($(UNAME), Linux)
+	LIN           = ld
+	CC            = gcc
+else
+	LIN           = x86_64-elf-ld
+	CC            = x86_64-elf-gcc 
+endif
 
 # Directory
 SOURCE_FOLDER = src
 OUTPUT_FOLDER = bin
-ISO_NAME      = OS2024
-# ISO           = mkisofs
+ifeq ($(UNAME), Linux)
+	ISO_NAME      = OS2024
+else
+	ISO_NAME = mkisofs
+endif
 
 # Flags
 WARNING_CFLAG = -Wall -Wextra
 DEBUG_CFLAG   = -fshort-wchar -g
-STRIP_CFLAG   = -nostdlib -fno-stack-protector -nostartfiles -fno-pie -nodefaultlibs -ffreestanding
-# STRIP_CFLAG   = -nostdlib -fno-stack-protector -nodefaultlibs -ffreestanding -mno-sse -mno-avx
+
+ifeq ($(UNAME), Linux)
+	STRIP_CFLAG   = -nostdlib -fno-stack-protector -nostartfiles -fno-pie -nodefaultlibs -ffreestanding
+else
+	STRIP_CFLAG   = -nostdlib -fno-stack-protector -nodefaultlibs -ffreestanding -mno-sse -mno-avx
+endif
+
 CFLAGS        = $(DEBUG_CFLAG) $(WARNING_CFLAG) $(STRIP_CFLAG) -m32 -c -I$(SOURCE_FOLDER)
 AFLAGS        = -f elf32 -g -F dwarf
 LFLAGS        = -T $(SOURCE_FOLDER)/linker.ld -melf_i386
