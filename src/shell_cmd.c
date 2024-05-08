@@ -189,15 +189,15 @@ void print_cur_dir(struct FAT32DirectoryTable dir_table){
 * goal berisikan nama folder yang ingin dibuat
 *
 * return 0: operasi berhasil
-* return 1: directory penuh
-* return 3: error lain
+* return 1: folder sudah ada
+* return 2: error lain
 */
 int mkdir(char *goal, int goalLength){
 
     struct ClusterBuffer temp = {0};
     struct FAT32DriverRequest req = {
         .buf                   = &temp,
-        .name                  = "\0\0\0\0",
+        .name                  = "\0\0\0\0\0\0\0\0",
         .ext                   = "\0\0\0",
         .parent_cluster_number = main_state.cwd_cluster_number,
         .buffer_size           = 0,
@@ -216,8 +216,6 @@ int mkdir(char *goal, int goalLength){
     {
     case 0:
         /* folder doesn't exist, thus make folder */
-        // char temp[8];
-        // strncpy(temp, goal, 8);
         strcat(name, "Folder \'");
         strcat(name, goal);
         strcat(name, "\' has been made");
@@ -226,14 +224,15 @@ int mkdir(char *goal, int goalLength){
         printToScreen(name, color_to_int(WHITE));
         printToScreen("\n", color_to_int(WHITE));
         printToScreen("\n", color_to_int(WHITE));
-        break;
+        return 0;
     case 1:
         /* folder already exists */
         printToScreen("\n", 0xc);
         printToScreen("A folder with the same name already exists", 0xa);
-        break;
+        return 1;
     }
-    return 0;
+
+    return 2;
 }
 
 /*
@@ -390,6 +389,59 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
 * return 3: error lain
 */
 int rm(char* goal, int goalLength){
+    struct ClusterBuffer res = {0};
+    struct FAT32DriverRequest req = {
+        .buf                   = &res,
+        .name                  = "\0\0\0\0\0\0\0\0",
+        .ext                   = "\0\0\0",
+        .parent_cluster_number = main_state.cwd_cluster_number,
+        .buffer_size           = 512,
+    };
+
+    char parse[16][64] = {0};
+    parse_filename(goal, strlen(goal), parse[0], parse[1]);
+
+    memcpy(req.name, parse[0], 8);
+    memcpy(req.ext, parse[1], 3);
+
+    if (req.ext[0] == '\0') {
+        req.buffer_size = 0;
+    }
+
+    uint8_t retcode;
+
+    if (req.name[0] == '\0') {
+        retcode = 1;
+    } else {
+        syscall(3, (uint32_t) &req, (uint32_t) &retcode, 0);
+    }
+
+    char name[6144] = {0};
+
+    switch (retcode)
+    {
+    case 0:
+        /* success */
+
+        strcat(name, "File/folder \'");
+        strcat(name, goal);
+        strcat(name, "\' deleted");
+    
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        return 0;
+    case 1:
+        /* File not found */
+        strcat(name, "File/folder \'");
+        strcat(name, goal);
+        strcat(name, "\' not found");
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        return 2;
+    case 2:
+    }
     return 3;
 }
 

@@ -55,6 +55,12 @@ void cmdHandler(){
             get_next_word();
             cd(main_state.currentWord, strlen(main_state.currentWord));
         }
+
+        else if (isStrEqual(main_state.currentWord, "rm")){
+            get_next_word();
+            rm(main_state.currentWord, strlen(main_state.currentWord));
+        }
+
         else if (isStrEqual(main_state.currentWord, "cp")){
             char goal[64] = {0};
             get_next_word();
