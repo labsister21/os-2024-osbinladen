@@ -1,6 +1,8 @@
-break user-shell.c:47
-break user-shell.c:99
-break user-shell.c:113
+break interrupt.c:92
+break shell_cmd.c:305
+break shell_cmd.c:357
 catch throw
+
+set exec-wrapper logging enabled
 
 set exec-wrapper logging enabled

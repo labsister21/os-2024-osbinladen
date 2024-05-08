@@ -136,11 +136,20 @@ void read_clusters(void *ptr, uint32_t cluster_number, uint8_t cluster_count){
 
 void copy_long_cluster(void* target,int fileClusterNumber){
     read_clusters(target, fileClusterNumber, 1);
-    if(driver_state.fat_table.cluster_map[fileClusterNumber] != FAT32_FAT_END_OF_FILE){
+    if(
+        driver_state.fat_table.cluster_map[fileClusterNumber] != FAT32_FAT_END_OF_FILE){
         copy_long_cluster(target+CLUSTER_SIZE,driver_state.fat_table.cluster_map[fileClusterNumber]);
     }
 }
 
+/*
+* read	- Membaca sebuah file dan memasukkan ke dalam buffer pada request
+*
+* return 0: operasi berhasil
+* return 1: Bukan sebuah file
+* return 2: File tidak ditemukan
+* return -1: error lain
+*/
 int8_t read(struct FAT32DriverRequest request){
     uint8_t returnCode = 2;
     read_clusters(driver_state.dir_table_buf.table,request.parent_cluster_number,1);
@@ -213,7 +222,14 @@ uint32_t get_empty_cluster() {
   return -1; 
 }
 
-
+/*
+* write	- Membuat sebuah file berisi buffer pada request
+*
+* return 0: operasi berhasil
+* return 1: File duplikat
+* return 2: Parent folder invalid
+* return -1: error lain
+*/
 int8_t write(struct FAT32DriverRequest request){
     read_clusters(driver_state.dir_table_buf.table,request.parent_cluster_number,1);
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY){

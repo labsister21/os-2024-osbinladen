@@ -67,5 +67,6 @@ void strcat(char* str1, char* str2){
 }
 
 int isStrEqual(void* str1, void* str2){
+    if (strlen(str1) != strlen(str2)) {return 0;}
     return memcmp(str1, str2, strlen(str1)) == 0;
 }

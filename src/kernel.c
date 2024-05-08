@@ -247,16 +247,15 @@ void kernel_setup(void) {
     // Allocate first 4 MiB virtual memory
     paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
 
-    // char code[0x1800];
-    // memset(code, 0x61, 0x1800);
-    // struct FAT32DriverRequest request = {
+    // char* code = "Leggo manigenski we go high reach the world muahahahahah lego aaaaaaaa bumbum go go go nigenski";
+    // struct FAT32DriverRequest req2 = {
     //     .buf         = code,
     //     .ext         = "\0\0\0",
-    //     .buffer_size = 0x1800,
-    //     .parent_cluster_number = 2,
-    //     .name = "shell"
+    //     .buffer_size = 100,
+    //     .parent_cluster_number = 0xF,
+    //     .name = "osama"
     // };
-    // int retcode = write(request);
+    // int retcode = write(req2);
 
     // Write shell into memory
     struct FAT32DriverRequest request = {

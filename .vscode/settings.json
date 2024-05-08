@@ -18,6 +18,8 @@
         "stddef.h": "c",
         "keyboard.h": "c",
         "charframe.h": "c",
-        "graphics.h": "c"
+        "graphics.h": "c",
+        "shell_cmd.h": "c",
+        "stdint.h": "c"
     },
 }
