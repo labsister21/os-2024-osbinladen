@@ -460,7 +460,6 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
     char source_name[8], dest_name[8], source_ext[3], dest_ext[3];
     get_only_filename(goal1, goal1Length, source_name, source_ext);
     get_only_filename(goal2, goal2Length, dest_name, dest_ext);
-    printToScreen("' sampae", color_to_int(GREEN));
     if(source_cluster == dest_cluster){
         if(isStrEqual(source_name, dest_name) && isStrEqual(source_ext, dest_ext)){
             printToScreen("\n'", color_to_int(GREEN));
