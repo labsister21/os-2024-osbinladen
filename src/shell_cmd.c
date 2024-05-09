@@ -602,15 +602,30 @@ void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, c
             continue;
         }
         if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
-            char entryname[9]; 
-            memcpy(entryname,dir_table.table[i].name,8);
-            entryname[9] = '\0'; 
             char subpath[256];
-            memcpy(subpath, path, strlen(path) + 1); 
-            strcat(subpath, entryname); 
-            if(isStrEqual(entryname,goal)){
-                memcpy(paths[*pathCount], subpath, strlen(subpath) + 1); 
-                (*pathCount)++;
+            if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
+                char entryname[9]; 
+                memcpy(entryname,dir_table.table[i].name,8);
+                entryname[9] = '\0'; 
+                memcpy(subpath, path, strlen(path) + 1); 
+                strcat(subpath, entryname); 
+                if(isStrEqual(entryname,goal)){
+                    memcpy(paths[*pathCount], subpath, strlen(subpath) + 1); 
+                    (*pathCount)++;
+                }
+            }
+            else{
+                char entryname[13];
+                memcpy(entryname,dir_table.table[i].name,8);
+                strcat(entryname,".");
+                strcat(entryname,dir_table.table[i].ext);
+                entryname[13] = '\0';
+                memcpy(subpath, path, strlen(path) + 1); 
+                strcat(subpath, entryname); 
+                if(isStrEqual(entryname,goal)){
+                    memcpy(paths[*pathCount], subpath, strlen(subpath) + 1); 
+                    (*pathCount)++;
+                }
             }
             if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
                 strcat(subpath, "/"); 
