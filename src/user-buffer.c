@@ -68,6 +68,14 @@ void cmdHandler(){
             get_next_word();
             cp(goal, strlen(goal), main_state.currentWord, strlen(main_state.currentWord));
         }
+        else if (isStrEqual(main_state.currentWord, "mv")){
+            char goal[64] = {0};
+            get_next_word();
+            memcpy(goal, main_state.currentWord, 64);
+            get_next_word();
+            printToScreen("sampai", color_to_int(GREEN));
+            mv(goal, strlen(goal), main_state.currentWord, strlen(main_state.currentWord));
+        }
         else if (isStrEqual(main_state.currentWord, "debug")){
             // int i = get_final_parent_cluster("wege/dito/bolang/gogo", 2);
         }
