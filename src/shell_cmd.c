@@ -53,6 +53,9 @@ int get_deep_folder_cluster (char* path, int current_folder_cluster){
     
     for(int i = 0; i < 64; i++){
         if (isStrEqual(parent, dir_table.table[i].name) && dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
+            if (dir_table.table[i].attribute != ATTR_SUBDIRECTORY && isStrEqual(dir_table.table[i].ext, '\0\0\0')){
+                return -1;
+            }
             if (isStrEqual(path, parent)){
                 return (uint16_t) dir_table.table[i].cluster_low + ((uint32_t) dir_table.table[i].cluster_high << 16);
             }
@@ -121,21 +124,16 @@ int cd(char* goal, int goalLength){
 
     struct FAT32DirectoryTable dir_table;
     syscall(10, main_state.cwd_cluster_number, (uint32_t)&dir_table, 0);
-    for(int i = 1; i < 64; i++){
-        if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
-            if (memcmp(dir_table.table[i].name, goal, goalLength) == 0){
-                if(dir_table.table[i].attribute != ATTR_SUBDIRECTORY){ // If not a folder
-                    printToScreen("\n", color_to_int(WHITE));
-                    printToScreen(goal, color_to_int(GREEN));
-                    printToScreen(" Bukanlah sebuah folder", color_to_int(GREEN));
-                    return 1;
-                }
-                else{
-                    main_state.cwd_cluster_number = (uint16_t) dir_table.table[i].cluster_low + ((uint32_t) dir_table.table[i].cluster_high << 16);
-                    return 0;
-                }
-            }
-        }
+    int new_cluster = get_deep_folder_cluster(goal, main_state.cwd_cluster_number);
+    if (new_cluster == -1){
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(goal, color_to_int(GREEN));
+        printToScreen(" Bukanlah sebuah folder", color_to_int(GREEN));
+        return 1;
+    }
+    else if (new_cluster != 0){
+        main_state.cwd_cluster_number = new_cluster;
+        return 0;
     }
     printToScreen("\n", color_to_int(WHITE));
     printToScreen(main_state.currentWord, color_to_int(GREEN));

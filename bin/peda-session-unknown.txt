@@ -1,5 +1,4 @@
-break interrupt.c:92
-break shell_cmd.c:357
+break interrupt.c:97
 catch throw
 
 set exec-wrapper logging enabled

@@ -325,6 +325,12 @@ bool is_folder_empty(uint32_t parent_cluster_number) {
 
 uint8_t get_dir_last_index();
 
+/**
+ * FAT32 delete, delete a file or empty directory (only 1 DirectoryEntry) in file system.
+ *
+ * @param request buf and buffer_size is unused
+ * @return Error code: 0 success - 1 not found - 2 folder is not empty - -1 unknown
+ */
 int8_t delete(struct FAT32DriverRequest request) {
     read_clusters(driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY) {
