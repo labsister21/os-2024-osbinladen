@@ -53,6 +53,9 @@ int get_deep_folder_cluster (char* path, int current_folder_cluster){
     
     for(int i = 0; i < 64; i++){
         if (isStrEqual(parent, dir_table.table[i].name) && dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
+            if (dir_table.table[i].attribute != ATTR_SUBDIRECTORY && isStrEqual(dir_table.table[i].ext, '\0\0\0')){
+                return -1;
+            }
             if (isStrEqual(path, parent)){
                 return (uint16_t) dir_table.table[i].cluster_low + ((uint32_t) dir_table.table[i].cluster_high << 16);
             }
@@ -121,21 +124,16 @@ int cd(char* goal, int goalLength){
 
     struct FAT32DirectoryTable dir_table;
     syscall(10, main_state.cwd_cluster_number, (uint32_t)&dir_table, 0);
-    for(int i = 1; i < 64; i++){
-        if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
-            if (memcmp(dir_table.table[i].name, goal, goalLength) == 0){
-                if(dir_table.table[i].attribute != ATTR_SUBDIRECTORY){ // If not a folder
-                    printToScreen("\n", color_to_int(WHITE));
-                    printToScreen(goal, color_to_int(GREEN));
-                    printToScreen(" Bukanlah sebuah folder", color_to_int(GREEN));
-                    return 1;
-                }
-                else{
-                    main_state.cwd_cluster_number = (uint16_t) dir_table.table[i].cluster_low + ((uint32_t) dir_table.table[i].cluster_high << 16);
-                    return 0;
-                }
-            }
-        }
+    int new_cluster = get_deep_folder_cluster(goal, main_state.cwd_cluster_number);
+    if (new_cluster == -1){
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(goal, color_to_int(GREEN));
+        printToScreen(" Bukanlah sebuah folder", color_to_int(GREEN));
+        return 1;
+    }
+    else if (new_cluster != 0){
+        main_state.cwd_cluster_number = new_cluster;
+        return 0;
     }
     printToScreen("\n", color_to_int(WHITE));
     printToScreen(main_state.currentWord, color_to_int(GREEN));
@@ -459,6 +457,110 @@ int rm(char* goal, int goalLength){
 * return 4: error lain
 */
 int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
+    int source_cluster = get_final_parent_cluster(goal1, main_state.cwd_cluster_number);
+    int dest_cluster = get_final_parent_cluster(goal2, main_state.cwd_cluster_number);
+    char source_name[8], dest_name[8], source_ext[3], dest_ext[3];
+    get_only_filename(goal1, goal1Length, source_name, source_ext);
+    get_only_filename(goal2, goal2Length, dest_name, dest_ext);
+    if(source_cluster == dest_cluster){
+        if(isStrEqual(source_name, dest_name) && isStrEqual(source_ext, dest_ext)){
+            printToScreen("\n'", color_to_int(GREEN));
+            printToScreen(goal1, color_to_int(GREEN));
+            printToScreen("' dan '", color_to_int(GREEN));
+            printToScreen(goal2, color_to_int(GREEN));
+            printToScreen("'merupakan file yang sama\n", color_to_int(GREEN));    
+            return 4;
+        }
+    }
+    if (source_cluster == 0){
+        printToScreen("\nFile tidak ditemukan\n", color_to_int(GREEN));
+        return 2;
+    }
+    else if (dest_cluster == 0){
+        printToScreen("\nFolder tujuan tidak ditemukan\n", color_to_int(GREEN));
+        return 3;
+    }
+
+    /* Pembacaan source file*/
+
+    struct ClusterBuffer temp = {0};
+    struct FAT32DriverRequest req = {
+        .buf                   = &temp,
+        .name                  = {0},
+        .ext                   = {0},
+        .parent_cluster_number = source_cluster,
+        .buffer_size           = CLUSTER_SIZE,
+    };
+    memcpy(req.name, source_name, 8);
+    memcpy(req.ext, source_ext, 3);
+
+    int retcode;
+    syscall(0, (uint32_t) &req, (uint32_t) &retcode, 0);
+
+    switch (retcode){
+        case 1 :
+            printToScreen("\n", color_to_int(WHITE));
+            printToScreen(goal1, color_to_int(GREEN));
+            printToScreen(" bukan sebuah file\n", color_to_int(GREEN));
+            return 1;
+        case 2 :
+            printToScreen("\nfile ", color_to_int(GREEN));
+            printToScreen(goal1, color_to_int(GREEN));
+            printToScreen(" tidak ditemukan\n", color_to_int(GREEN));
+            return 2;
+        case -1 :
+            printToScreen("\nterjadi anomali pada pembacaan file ", color_to_int(GREEN));
+            printToScreen(goal1, color_to_int(GREEN));
+            printToScreen("\n", color_to_int(GREEN));
+            return 3;
+        case 0:
+            break;
+        default:
+            return 3;
+    }
+
+    /*Pembuatan copy dari source file*/
+    
+    req.parent_cluster_number = dest_cluster;
+    memcpy(req.name, dest_name, 8);
+    memcpy(req.ext, dest_ext, 3);
+    syscall(2, (uint32_t) &req, (uint32_t) &retcode, 0);
+
+    switch (retcode){
+        case 1 :
+            printToScreen("\nFile dengan nama ", color_to_int(GREEN));
+            printToScreen(goal2, color_to_int(GREEN));
+            printToScreen(" sudah ada\n", color_to_int(GREEN));
+            return 1;
+        case 2 :
+            printToScreen("\nanomali\n", color_to_int(GREEN));
+            return 2;
+        case -1 :
+            printToScreen("\nterjadi anomali pada pembuatan file ", color_to_int(GREEN));
+            printToScreen(goal2, color_to_int(GREEN));
+            printToScreen("\n", color_to_int(GREEN));
+            return 3;
+        case 0:
+            break;
+        default:
+            return 3;
+    }
+
+    /* Penghapusan file lama*/
+    req.parent_cluster_number = source_cluster;
+    memcpy(req.name, source_name, 8);
+    memcpy(req.ext, source_ext, 3);
+    syscall(3, (uint32_t) &req, (uint32_t) &retcode, 0);
+
+    switch (retcode){
+        case 0:
+            printToScreen("\nMove berhasil\n", color_to_int(GREEN));
+            return 0;
+        default:
+            printToScreen("\nAnomali saat penghapusan file lama", color_to_int(GREEN));
+            return 3;
+    }
+
     return 3;
 }
 

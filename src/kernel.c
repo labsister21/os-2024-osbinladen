@@ -252,7 +252,7 @@ void kernel_setup(void) {
     //     .buf         = code,
     //     .ext         = "\0\0\0",
     //     .buffer_size = 100,
-    //     .parent_cluster_number = 0xF,
+    //     .parent_cluster_number = 0x10,
     //     .name = "osama"
     // };
     // int retcode = write(req2);
