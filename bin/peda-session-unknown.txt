@@ -1,4 +1,0 @@
-break interrupt.c:97
-catch throw
-
-set exec-wrapper logging enabled
