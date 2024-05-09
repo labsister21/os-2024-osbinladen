@@ -120,16 +120,16 @@ void keyboard_isr(void) {
     if (keyboard_state.keyboard_input_on) {
         char key;
 
-        // Check if the shift key is pressed and modify the key accordingly
-        if ((scancode & 0x80) == 0x80) { // Check if key is released
-            if (scancode == 0xAA || scancode == 0xB6) { // Left or right shift key released
+        
+        if ((scancode & 0x80) == 0x80) { 
+            if (scancode == 0xAA || scancode == 0xB6) { 
                 keyboard_state.shift_pressed = false;
             }
         } else {
-            if (scancode == 0x2A || scancode == 0x36) { // Left or right shift key pressed
+            if (scancode == 0x2A || scancode == 0x36) { 
                 keyboard_state.shift_pressed = true;
             } else {
-                // Retrieve character from the appropriate map based on shift key state
+               
                 if (keyboard_state.shift_pressed) {
                     key = keyboard_scancode_1_to_ascii_map_with_shift[scancode];
                 } else {

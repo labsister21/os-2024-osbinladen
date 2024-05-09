@@ -164,8 +164,10 @@ void print_cur_dir(struct FAT32DirectoryTable dir_table){
     printToScreen("\n", color_to_int(WHITE));
 
     for(int i = 1; i < 64; i++){
+        if(isStrEqual(dir_table.table[i].name,"..")){
+            continue;
+        }
         if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
-      
                 if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
                     printToScreen(dir_table.table[i].name, color_to_int(BLUE));
                
@@ -468,8 +470,53 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
 * return 1: tujuan tidak ditemukan
 * return 3: error lain
 */
+
 int find(char* goal, int goalLength){
-    return 3;
+    char paths[64][256]; // Array to store the paths
+    int pathCount = 0; // Number of paths found
+    char path[256] = "\nroot/"; // Start with the root directory
+    dfs_find(ROOT_CLUSTER_NUMBER, goal, goalLength, path, paths, &pathCount);
+    if(pathCount == 0){
+        printToScreen("\n\nNo such file or directory\n",color_to_int(WHITE));
+        return 1;
+    }
+    else{
+        for(int i = 0; i < pathCount; i++){
+            printToScreen(paths[i], color_to_int(WHITE)); // Print each path
+            printToScreen("\n", color_to_int(WHITE));
+        }
+        return 0;
+    }
+}
+
+void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, char paths[64][256], int* pathCount){
+    if(*pathCount >= 64){
+        return; 
+    }
+    struct FAT32DirectoryTable dir_table;
+    syscall(10, cluster_number, (uint32_t)&dir_table, 0);
+    for(int i = 1;i<64;i++){
+        if(isStrEqual(dir_table.table[i].name,"..")){
+            continue;
+        }
+        if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
+            char entryname[9]; 
+            memcpy(entryname,dir_table.table[i].name,8);
+            entryname[9] = '\0'; 
+            char subpath[256];
+            memcpy(subpath, path, strlen(path) + 1); 
+            strcat(subpath, entryname); 
+            if(isStrEqual(entryname,goal)){
+                memcpy(paths[*pathCount], subpath, strlen(subpath) + 1); 
+                (*pathCount)++;
+            }
+            if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
+                strcat(subpath, "/"); 
+                uint32_t cluster_num = dir_table.table[i].cluster_high << 16 | dir_table.table[i].cluster_low;
+                dfs_find(cluster_num, goal, goalLength, subpath, paths, pathCount);
+            }
+        }
+    }
 }
 
 // ============================================ BATAS SUCI ===========================================

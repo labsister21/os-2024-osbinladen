@@ -105,6 +105,8 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length);
 */
 int find(char* goal, int goalLength);
 
+void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, char paths[64][256], int* pathCount);
+
 // ============================================ BATAS SUCI ===========================================
 void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 
