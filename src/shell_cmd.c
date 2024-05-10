@@ -86,7 +86,7 @@ void parse_filename(char* file, int nameLength, char* nameDest, char* extDest){
     if (dot_found) {
         i++;
         int ext_index = 0;
-        while (i < nameLength && file[i] != '\0') {
+        for (int j = 0; j < 3; j++) {
             extDest[ext_index] = file[i];
             ext_index++;
             i++;
@@ -324,7 +324,7 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
 
     get_only_filename(goal, goalLength, req.name, req.ext);
 
-    int retcode;
+    int retcode = 0;
     syscall(0, (uint32_t) &req, (uint32_t) &retcode, 0);
 
     switch (retcode){
