@@ -2,6 +2,7 @@
 #include "header/cpu/portio.h"
 #include "header/stdlib/string.h"
 
+
 static struct KeyboardDriverState keyboard_state = {
     .read_extended_mode = false,
     .keyboard_input_on = false,

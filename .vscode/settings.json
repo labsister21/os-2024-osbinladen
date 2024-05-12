@@ -20,6 +20,7 @@
         "charframe.h": "c",
         "graphics.h": "c",
         "shell_cmd.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "user-buffer.h": "c"
     },
 }

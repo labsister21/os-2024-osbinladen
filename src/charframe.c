@@ -75,7 +75,7 @@ void handle_others(char key){
 
 
 void handle_left_arrow(){
-    if (charBuffer[pos-2] != '$') {
+    if (charBuffer[pos-2] != '/') {
         pos--; 
         char temp = charBuffer[pos];
         charBuffer[pos+1] = charBuffer[pos];

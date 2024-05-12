@@ -79,7 +79,6 @@ void cmdHandler(){
             get_next_word();
             memcpy(goal, main_state.currentWord, 64);
             get_next_word();
-            printToScreen("sampai", color_to_int(GREEN));
             mv(goal, strlen(goal), main_state.currentWord, strlen(main_state.currentWord));
         }
         else if (isStrEqual(main_state.currentWord, "rm")){
@@ -202,15 +201,15 @@ void deleteLine(){
 }
 
 void handle_up_arrow(){
-    if(main_state.last_index_arrow == 0){
-        return;
-    }
-    deleteLine();
-    main_state.last_index_arrow--;
-    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
-    for (int i = 0; i < length; i++) {
-        inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
-    }
+    // if(main_state.last_index_arrow == 0){
+    //     return;
+    // }
+    // deleteLine();
+    // main_state.last_index_arrow--;
+    // int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+    // for (int i = 0; i < length; i++) {
+    //     inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
+    // }
 }
 
 void handle_down_arrow(){
