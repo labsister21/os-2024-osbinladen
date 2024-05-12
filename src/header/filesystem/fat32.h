@@ -220,7 +220,7 @@ void read_clusters(void *ptr, uint32_t cluster_number, uint8_t cluster_count);
  * @return Error code: 0 success - 1 not a folder - 2 not found - -1 unknown
  */
 
-void copy_long_cluster(void* target, int file_cluster_number);
+void copy_long_cluster(void* target, uint32_t remaining_size,int file_cluster_number);
 
 int8_t read_directory(struct FAT32DriverRequest request);
 
