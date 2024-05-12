@@ -247,12 +247,12 @@ void kernel_setup(void) {
     // Allocate first 4 MiB virtual memory
     paging_allocate_user_page_frame(&_paging_kernel_page_directory, (uint8_t*) 0);
 
-    // char* code = "Leggo manigenski we go high reach the world muahahahahah lego aaaaaaaa bumbum go go go nigenski";
+    // char* code = "osama tongkol";
     // struct FAT32DriverRequest req2 = {
     //     .buf         = code,
     //     .ext         = "\0\0\0",
     //     .buffer_size = 100,
-    //     .parent_cluster_number = 0x12,
+    //     .parent_cluster_number = 0x14,
     //     .name = "osama"
     // };
     // int retcode = write(req2);
