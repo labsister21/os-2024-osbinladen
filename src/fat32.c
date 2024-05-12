@@ -452,7 +452,7 @@ int8_t delete_all(struct FAT32DriverRequest request){
     // write update on storage
     struct FAT32DirectoryEntry empty_entry = {0};
     driver_state.dir_table_buf.table[index] = empty_entry;
-    driver_state.fat_table.cluster_map[entry_index] == FAT32_FAT_EMPTY_ENTRY;
+    driver_state.fat_table.cluster_map[entry_index] = FAT32_FAT_EMPTY_ENTRY;
     write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
     write_clusters(driver_state.fat_table.cluster_map, FAT_CLUSTER_NUMBER, 1);
     return 0;
