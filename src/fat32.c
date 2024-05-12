@@ -337,7 +337,7 @@ int8_t delete(struct FAT32DriverRequest request) {
         return -1;
     }
     int index = -1;
-    unsigned int i = 0;
+    unsigned int i = 1;
 
     while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && index == -1) {
         if (memcmp(driver_state.dir_table_buf.table[i].name, request.name, 8) == 0 &&

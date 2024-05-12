@@ -398,11 +398,7 @@ int rm(char* goal, int goalLength){
         .buffer_size           = 512,
     };
 
-    char parse[16][64] = {0};
-    parse_filename(goal, strlen(goal), parse[0], parse[1]);
-
-    memcpy(req.name, parse[0], 8);
-    memcpy(req.ext, parse[1], 3);
+    parse_filename(goal, strlen(goal), req.name, req.ext);
 
     if (req.ext[0] == '\0') {
         req.buffer_size = 0;
