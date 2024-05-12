@@ -105,7 +105,7 @@ void handle_newline(){
   get_next_word();
   cmdHandler();
   syscall(6, (uint32_t) "OS BIN lADEN ", 13, color_to_int(GREEN));
-  print_path_from_root(main_state.cwd_cluster_number, color_to_int(GREEN));
+  print_path_from_root(main_state.cwd_cluster_number, color_to_int(LIGHT_BLUE));
   printToScreen(" ", color_to_int(GREEN));
 }
 

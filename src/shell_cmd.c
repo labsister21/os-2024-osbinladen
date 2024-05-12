@@ -86,7 +86,7 @@ void parse_filename(char* file, int nameLength, char* nameDest, char* extDest){
     if (dot_found) {
         i++;
         int ext_index = 0;
-        while (i < nameLength && file[i] != '\0') {
+        for (int j = 0; j < 3; j++) {
             extDest[ext_index] = file[i];
             ext_index++;
             i++;
@@ -167,7 +167,7 @@ void print_cur_dir(struct FAT32DirectoryTable dir_table){
         }
         if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
                 if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
-                    printToScreen(dir_table.table[i].name, color_to_int(BLUE));
+                    printToScreen(dir_table.table[i].name, color_to_int(LIGHT_BLUE));
                
                     printToScreen("    ", color_to_int(WHITE));
                 }
@@ -324,7 +324,7 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
 
     get_only_filename(goal, goalLength, req.name, req.ext);
 
-    int retcode;
+    int retcode = 0;
     syscall(0, (uint32_t) &req, (uint32_t) &retcode, 0);
 
     switch (retcode){
@@ -398,11 +398,7 @@ int rm(char* goal, int goalLength){
         .buffer_size           = 512,
     };
 
-    char parse[16][64] = {0};
-    parse_filename(goal, strlen(goal), parse[0], parse[1]);
-
-    memcpy(req.name, parse[0], 8);
-    memcpy(req.ext, parse[1], 3);
+    parse_filename(goal, strlen(goal), req.name, req.ext);
 
     if (req.ext[0] == '\0') {
         req.buffer_size = 0;

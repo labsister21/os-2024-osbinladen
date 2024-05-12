@@ -18,6 +18,7 @@
 #define BLUE (Color16){0b11111, 0, 0}
 #define GREEN (Color16){0, 0b111111, 0}
 #define RED (Color16){0, 0, 0b11111}
+#define LIGHT_BLUE (Color16){6, 38, 31}
 #define WHITE (Color16){0b11111, 0b111111, 0b11111}
 
 typedef struct color16 {
