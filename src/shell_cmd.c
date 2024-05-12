@@ -51,7 +51,7 @@ int get_deep_folder_cluster (char* path, int current_folder_cluster){
     struct FAT32DirectoryTable dir_table;
     syscall(10, current_folder_cluster, (uint32_t)&dir_table, 0);
     
-    for(int i = 0; i < 64; i++){
+    for(int i = 1; i < 64; i++){
         if (isStrEqual(parent, dir_table.table[i].name) && dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
             if (dir_table.table[i].attribute != ATTR_SUBDIRECTORY && isStrEqual(dir_table.table[i].ext, '\0\0\0')){
                 return -1;
@@ -384,8 +384,8 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
 * goal berisikan nama file
 *
 * return 0: operasi berhasil
-* return 1: Bukan sebuah file
-* return 2: File tidak ditemukan
+* return 1: folder tidak kosong
+* return 2: File/folder tidak ditemukan
 * return 3: error lain
 */
 int rm(char* goal, int goalLength){
@@ -437,9 +437,83 @@ int rm(char* goal, int goalLength){
         printToScreen("\n", color_to_int(WHITE));
         return 2;
     case 2:
+        /* File not found */
+        strcat(name, "Folder \'");
+        strcat(name, goal);
+        strcat(name, "\' not empty");
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        return 1;
+    default:
+        return 3;
     }
     return 3;
 }
+
+/*
+* rmr    - Menghapus suatu file atau folder (dan menghapus semua isi folder )
+* goal berisikan nama file
+*
+* return 0: operasi berhasil
+* return 2: File/folder tidak ditemukan
+* return 3: error lain
+*/
+int rmr(char* goal, int goalLength){
+    struct ClusterBuffer res = {0};
+    struct FAT32DriverRequest req = {
+        .buf                   = &res,
+        .name                  = "\0\0\0\0\0\0\0\0",
+        .ext                   = "\0\0\0",
+        .parent_cluster_number = main_state.cwd_cluster_number,
+        .buffer_size           = 512,
+    };
+
+    parse_filename(goal, strlen(goal), req.name, req.ext);
+
+    if (req.ext[0] == '\0') {
+        req.buffer_size = 0;
+    }
+
+    uint8_t retcode;
+
+    if (req.name[0] == '\0') {
+        retcode = 1;
+    } else {
+        syscall(9, (uint32_t) &req, (uint32_t) &retcode, 0);
+    }
+
+    char name[6144] = {0};
+
+    switch (retcode)
+    {
+    case 0:
+        /* success */
+
+        strcat(name, "File/folder \'");
+        strcat(name, goal);
+        strcat(name, "\' deleted");
+    
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        return 0;
+    case 1:
+        /* File not found */
+        strcat(name, "File/folder \'");
+        strcat(name, goal);
+        strcat(name, "\' not found");
+        printToScreen("\n", color_to_int(WHITE));
+        printToScreen(name, color_to_int(WHITE));
+        printToScreen("\n", color_to_int(WHITE));
+        return 2;
+    default:
+        printToScreen("Anomaly in deleting",color_to_int(GREEN));
+        return 3;
+    }
+    return 3;
+}
+
 
 /*
 * mv	- Memindah dan merename lokasi file/folder

@@ -117,7 +117,11 @@ void syscall(struct InterruptFrame frame) {
         case 8:
             draw_cursor();
             break;
-
+        case 9:
+            *((int8_t*) frame.cpu.general.ecx) = delete_all(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx)
+            );
+            break;
         case 10:
             struct FAT32DirectoryTable *dir_table = (struct FAT32DirectoryTable *)frame.cpu.general.ecx;
             get_curr_working_dir(frame.cpu.general.ebx, dir_table);

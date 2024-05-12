@@ -58,7 +58,13 @@ void cmdHandler(){
 
         else if (isStrEqual(main_state.currentWord, "rm")){
             get_next_word();
-            rm(main_state.currentWord, strlen(main_state.currentWord));
+            if(isStrEqual(main_state.currentWord, "-r")){
+                get_next_word();
+                rmr(main_state.currentWord, strlen(main_state.currentWord));
+            }
+            else{
+                rm(main_state.currentWord, strlen(main_state.currentWord)); 
+            }
         }
 
         else if (isStrEqual(main_state.currentWord, "cp")){
