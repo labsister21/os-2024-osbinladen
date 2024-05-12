@@ -109,7 +109,9 @@ void cmdHandler(){
 }
 
 void handle_newline(){
-  main_state.userBuffer[main_state.userBufferPos] = ' ';
+  main_state.userBuffer[main_state.userBufferPos] = '\n';
+  appendChar();
+  main_state.last_index_arrow = len(main_state.stringBuffer);
   main_state.userBufferPos++;
   get_next_word();
   cmdHandler();
@@ -155,5 +157,57 @@ void inputChar(char c){
           handle_others(c);
           break;
       }
+    }
+}
+
+void appendChar(){
+    int current_string = 0;
+    int current_char = 0;
+    memset(main_state.stringBuffer, 0, len(main_state.stringBuffer));
+    for (int i = 0; i < len(main_state.userBuffer); i++) {
+        if (main_state.userBuffer[i] == '\n') {
+            if (current_char != 0) {  // Avoid adding empty strings if \n appears at the start or consecutively
+                main_state.stringBuffer[current_string][current_char] = '\0';  // Null-terminate the current string
+                current_string++;  // Move to the next string in the array
+                current_char = 0;  // Reset character position for the new string
+            }
+        } else {
+            if (current_char < 256) {
+                main_state.stringBuffer[current_string][current_char++] = main_state.userBuffer[i];
+            }
+        }
+    }
+}
+
+void deleteLine(){
+    if (main_state.userBufferPos == 0){return;}
+    while(main_state.userBufferPos != 0){
+        main_state.userBuffer[main_state.userBufferPos - 1] = 0;
+        main_state.userBufferPos--;
+        syscall(5, (uint32_t) '\b', color_to_int(WHITE), 0);
+    }
+}
+
+void handle_up_arrow(){
+    if(main_state.last_index_arrow == 0){
+        return;
+    }
+    deleteLine();
+    main_state.last_index_arrow--;
+    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+    for (int i = 0; i < length; i++) {
+        inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
+    }
+}
+
+void handle_down_arrow(){
+    if(main_state.last_index_arrow == len(main_state.stringBuffer)){
+        return;
+    }
+    deleteLine();
+    main_state.last_index_arrow++;
+    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+    for (int i = 0; i < length; i++) {
+        inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
     }
 }

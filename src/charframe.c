@@ -1,5 +1,6 @@
 #include "header/driver/charframe.h"
 #include "header/stdlib/string.h"
+#include "header/driver/keyboard.h"
 
 int pos = 0;
 char charBuffer[TEXT_WIDTH*TEXT_HEIGHT];
@@ -8,10 +9,8 @@ char current_char();
 void handle_newline();
 void handle_tab();
 void handle_backspace();
-void handle_up_arrow();
 void handle_left_arrow();
 void handle_right_arrow();
-void handle_down_arrow();
 
 char get_char_buffer_at(int idx){
     return charBuffer[idx];
@@ -71,37 +70,6 @@ void handle_others(char key){
   if (key >= 32 && key <= 126){
     charBuffer[pos] = key;
     pos++;
-  }
-}
-
-void handle_up_arrow(){
-  uint16_t origin_row = pos/TEXT_WIDTH;
-  if (origin_row == 0) {return;}
-  pos = (pos/TEXT_WIDTH)*TEXT_WIDTH - 1;
-
-  while (current_char() == 0x0 || current_char() == '\n'){
-
-    pos--;
-
-    if (origin_row*TEXT_WIDTH - pos == TEXT_WIDTH){
-      return;
-    }
-  }
-  pos++;
-}
-
-void handle_down_arrow(){
-  uint16_t origin_row = pos/TEXT_WIDTH;
-  if (origin_row == TEXT_HEIGHT - 1) {return;}
-  pos = (pos/TEXT_WIDTH + 1)*TEXT_WIDTH;
-
-  while (current_char() != 0x0 && current_char() != '\n' && current_char() != '\t'){
-
-    pos++;
-
-    if (pos - origin_row*TEXT_WIDTH == TEXT_WIDTH){
-      return;
-    }
   }
 }
 

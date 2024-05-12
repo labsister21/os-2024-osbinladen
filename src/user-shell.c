@@ -4,10 +4,12 @@
 
 struct ShellState main_state = {
     .userBuffer = {0},
+    .stringBuffer = {0, 0},
     .currentWord = {0},
     .readPointer = 0,
     .userBufferPos = 0,
     .cwd_cluster_number = 0x2,
+    .last_index_arrow = 0,
 };
 
 int main(void) {
