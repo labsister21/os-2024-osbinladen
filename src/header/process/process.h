@@ -46,8 +46,37 @@
 #define PROCESS_CREATE_FAIL_FS_READ_FAILURE      4
 
 
+/**
+ * Contain information needed for task to be able to get interrupted and resumed later
+ *
+ * @param cpu                         All CPU register state
+ * @param eip                         CPU instruction counter to resume execution
+ * @param eflags                      Flag register to load before resuming the execution
+ * @param page_directory_virtual_addr CPU register CR3, containing pointer to active page directory
+ */
+
+typedef struct AllCPURegister {
+    unsigned int eax, ebx, ecx, edx;  // General purpose registers
+    unsigned int esi, edi;            // Index and pointer registers
+    unsigned int esp, ebp;            // Stack pointer and base pointer
+    unsigned int eip;                 // Instruction pointer
+    unsigned int eflags;              // Flags register
+    unsigned int cs, ds, es, fs, gs, ss; // Segment registers
+} AllCPURegister;
+
+typedef struct Context {
+    AllCPURegister cpu;                        // All CPU register states
+    unsigned int page_directory_virtual_addr; // Virtual address of the page directory
+} Context;
 
 
+typedef enum PROCESS_STATE {
+    READY,
+    RUNNING,
+    WAITING,
+    TERMINATED,
+    NEW
+} PROCESS_STATE;
 
 /**
  * Get currently running process PCB pointer
