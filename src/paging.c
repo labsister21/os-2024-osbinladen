@@ -161,7 +161,11 @@ struct PageDirectory* paging_create_new_page_directory(void) {
                 page_directory_list[i].table[j].flag.present_bit = 0; 
             }
 
-            struct PageDirectoryEntryFlag flag = {.present_bit = 1, .write_bit = 1, .user_supervisor_bit = 0, .use_pagesize_4_mb = 1};
+            struct PageDirectoryEntryFlag flag = {
+                .present_bit = 1, 
+                .write_bit = 1, 
+                .use_pagesize_4_mb = 1
+            };
             page_directory_list[i].table[0x300].flag = flag;
             page_directory_list[i].table[0x300].lower_address = 0;
 
