@@ -14,7 +14,7 @@ const char keyboard_scancode_1_to_ascii_map[256] = {
     'q',  'w', 'e', 'r', 't', 'y', 'u', 'i',  'o', 'p', '[',  ']', '\n',   0,  'a',  's',
     'd',  'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',   0, '\\',  'z', 'x',  'c',  'v',
     'b',  'n', 'm', ',', '.', '/',   0, '*',    0, ' ',   0,    0,    0,   0,    0,    0,
-      0,    0,   0,   0,   0,   0,   0,   0,    0,   0, '-',    0,    0,   0,  '+',    0,
+      0,    0,   0,   0,   0,   0,   0,  0x11,    0,   0, '-',    0,    0,   0,  '+',    0,
       0,    0,   0,   0,   0,   0,   0,   0,    0,   0,   0,    0,    0,   0,    0,    0,
       0,    0,   0,   0,   0,   0,   0,   0,    0,   0,   0,    0,    0,   0,    0,    0,
       0,    0,   0,   0,   0,   0,   0,   0,    0,   0,   0,    0,    0,   0,    0,    0,
@@ -74,10 +74,6 @@ void keyboard_isr(void) {
                     handle_left_arrow();
                 } else if (scancode == EXT_SCANCODE_RIGHT) {
                     handle_right_arrow();
-                } else if (scancode == EXT_SCANCODE_UP){
-                    handle_up_arrow();
-                } else if (scancode == EXT_SCANCODE_DOWN){
-                    handle_down_arrow();
                 }else {
                     if (keyboard_state.shift_pressed) {
                         key = keyboard_scancode_1_to_ascii_map_with_shift[scancode];

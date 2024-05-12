@@ -153,6 +153,9 @@ void inputChar(char c){
         case '\b':
           handle_backspace();
           break;
+        case 0x11:
+            handle_up_arrow();
+            break;
         default:
           handle_others(c);
           break;
