@@ -152,6 +152,22 @@ struct PageDirectory* paging_create_new_page_directory(void) {
      * - Set page_directory.table[0x300] with kernel page directory entry
      * - Return the page directory address
      */ 
+
+    for (int i = 0; i < PAGING_DIRECTORY_TABLE_MAX_COUNT; i++) {
+        if (!page_directory_manager.page_directory_used[i]) {
+            page_directory_manager.page_directory_used[i] = true;
+
+            for (int j = 0; j < PAGE_ENTRY_COUNT; j++) {
+                page_directory_list[i].table[j].flag.present_bit = 0; 
+            }
+
+            struct PageDirectoryEntryFlag flag = {.present_bit = 1, .write_bit = 1, .user_supervisor_bit = 0, .use_pagesize_4_mb = 1};
+            page_directory_list[i].table[0x300].flag = flag;
+            page_directory_list[i].table[0x300].lower_address = 0;
+
+            return &page_directory_list[i];
+        }
+    }
     return NULL;
 }
 
@@ -162,6 +178,17 @@ bool paging_free_page_directory(struct PageDirectory *page_dir) {
      * - If matches, mark the page directory as unusued and clear all page directory entry
      * - Return true
      */
+
+    for (int i = 0; i < PAGING_DIRECTORY_TABLE_MAX_COUNT; i++) {
+        if (&page_directory_list[i] == page_dir) {
+            page_directory_manager.page_directory_used[i] = false;
+
+            for (int j = 0; j < PAGE_ENTRY_COUNT; j++) {
+                page_directory_list[i].table[j].flag.present_bit = 0; 
+            }
+            return true;
+        }
+    }
     return false;
 }
 
