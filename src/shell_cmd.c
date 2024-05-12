@@ -683,7 +683,6 @@ void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, c
 
 
 void clear(){
-
     memset(main_state.userBuffer, 0, TEXT_HEIGHT*TEXT_WIDTH);
     syscall(11,0,0,0);
 }
