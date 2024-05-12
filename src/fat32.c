@@ -134,11 +134,12 @@ void read_clusters(void *ptr, uint32_t cluster_number, uint8_t cluster_count){
     read_blocks(ptr, cluster_to_lba(cluster_number), cluster_count*CLUSTER_BLOCK_COUNT);
 }
 
-void copy_long_cluster(void* target,int fileClusterNumber){
+void copy_long_cluster(void* target, uint32_t remaining_size ,int fileClusterNumber){
+    if(remaining_size <= 0) return;
     read_clusters(target, fileClusterNumber, 1);
     if(
         driver_state.fat_table.cluster_map[fileClusterNumber] != FAT32_FAT_END_OF_FILE){
-        copy_long_cluster(target+CLUSTER_SIZE,driver_state.fat_table.cluster_map[fileClusterNumber]);
+        copy_long_cluster(target+CLUSTER_SIZE, remaining_size-CLUSTER_SIZE,driver_state.fat_table.cluster_map[fileClusterNumber]);
     }
 }
 
@@ -163,7 +164,7 @@ int8_t read(struct FAT32DriverRequest request){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 if(memcmp(driver_state.dir_table_buf.table[i].ext,request.ext,3)==0){
                     returnCode = 0;
-                    copy_long_cluster(request.buf, (unsigned int)driver_state.dir_table_buf.table[i].cluster_low
+                    copy_long_cluster(request.buf, request.buffer_size, (unsigned int)driver_state.dir_table_buf.table[i].cluster_low
                     | ((unsigned int)driver_state.dir_table_buf.table[i].cluster_high << 16));
                 }
                 else returnCode = 1;
@@ -195,7 +196,7 @@ int8_t read_directory(struct FAT32DriverRequest request){
             if(memcmp(driver_state.dir_table_buf.table[i].name,request.name,8)==0){
                 if (driver_state.dir_table_buf.table[i].attribute == ATTR_SUBDIRECTORY){
                     returnCode = 0;
-                    copy_long_cluster(request.buf, (unsigned int)driver_state.dir_table_buf.table[i].cluster_low
+                    copy_long_cluster(request.buf, request.buffer_size, (unsigned int)driver_state.dir_table_buf.table[i].cluster_low
                     | ((unsigned int)driver_state.dir_table_buf.table[i].cluster_high << 16));
                 }
                 else returnCode = 1;
