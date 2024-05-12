@@ -21,5 +21,9 @@ void handle_tab();
 void handle_backspace();
 void handle_others(char key);
 void inputChar(char c);
+void deleteLine();
+void appendChar();
+void handle_down_arrow();
+void handle_up_arrow();
 
 #endif

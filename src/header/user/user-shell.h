@@ -9,10 +9,12 @@
 
 struct ShellState {
     char    userBuffer[TEXT_HEIGHT*TEXT_WIDTH];
+    char    stringBuffer[256][256];
     int     userBufferPos;
     int     readPointer;
     char    currentWord[64];
     int     cwd_cluster_number;
+    int     last_index_arrow;
 };
 
 extern struct ShellState main_state;

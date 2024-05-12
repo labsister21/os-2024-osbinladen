@@ -104,9 +104,10 @@ typedef struct ProcessControlBlock {
     ProcessMemory memory;
 } ProcessControlBlock;
 
-// Deklarasi array statik PCB
-ProcessControlBlock _process_list[PROCESS_COUNT_MAX];
-
+typedef struct {
+    int active_process_count; 
+    ProcessControlBlock process_list[PROCESS_COUNT_MAX];
+} ProcessManagerState;
 
 /**
  * Get currently running process PCB pointer

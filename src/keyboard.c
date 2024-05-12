@@ -70,11 +70,15 @@ void keyboard_isr(void) {
             if (scancode == 0x2A || scancode == 0x36) { 
                 keyboard_state.shift_pressed = true;
             } else {
-                if (scancode == 0x4B) {
+                if (scancode == EXT_SCANCODE_LEFT) {
                     handle_left_arrow();
-                } else if (scancode == 0x4D) {
+                } else if (scancode == EXT_SCANCODE_RIGHT) {
                     handle_right_arrow();
-                } else {
+                } else if (scancode == EXT_SCANCODE_UP){
+                    handle_up_arrow();
+                } else if (scancode == EXT_SCANCODE_DOWN){
+                    handle_down_arrow();
+                }else {
                     if (keyboard_state.shift_pressed) {
                         key = keyboard_scancode_1_to_ascii_map_with_shift[scancode];
                     } else {
