@@ -121,5 +121,10 @@ void syscall(struct InterruptFrame frame) {
         case 10:
             struct FAT32DirectoryTable *dir_table = (struct FAT32DirectoryTable *)frame.cpu.general.ecx;
             get_curr_working_dir(frame.cpu.general.ebx, dir_table);
+            break;
+        case 11:
+            set_screen_color(BLACK);
+            reset_buffer();
+            break;
     }
 }

@@ -87,6 +87,9 @@ void cmdHandler(){
             get_next_word();
             find(main_state.currentWord, strlen(main_state.currentWord));
         }
+        else if(isStrEqual(main_state.currentWord, "clear")){
+            clear();
+        }
      
         else{
             printToScreen("\n", color_to_int(BLACK));
