@@ -617,9 +617,14 @@ void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, c
             else{
                 char entryname[13];
                 memcpy(entryname,dir_table.table[i].name,8);
-                strcat(entryname,".");
-                strcat(entryname,dir_table.table[i].ext);
-                entryname[13] = '\0';
+                if(dir_table.table[i].ext[0] == '\0'){
+                    entryname[8] = '\0';
+                }
+                else{
+                    strcat(entryname,".");
+                    strcat(entryname,dir_table.table[i].ext);
+                    entryname[13] = '\0';
+                }
                 memcpy(subpath, path, strlen(path) + 1); 
                 strcat(subpath, entryname); 
                 if(isStrEqual(entryname,goal)){

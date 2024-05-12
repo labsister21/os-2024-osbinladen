@@ -19,6 +19,10 @@ int main(void) {
         .parent_cluster_number = ROOT_CLUSTER_NUMBER,
         .buffer_size           = CLUSTER_SIZE,
     };
+
+    
+
+
     int32_t retcode;
     syscall(0, (uint32_t) &request, (uint32_t) &retcode, 0);
     if (retcode == 0)
