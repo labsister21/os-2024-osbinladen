@@ -130,5 +130,10 @@ void syscall(struct InterruptFrame frame) {
             set_screen_color(BLACK);
             reset_buffer();
             break;
+        case 12:
+            *((int8_t*) frame.cpu.general.edx) = move(
+                *((struct FAT32DriverRequest*) frame.cpu.general.ebx), *((struct FAT32DriverRequest*) frame.cpu.general.ecx)
+            );
+            break;
     }
 }

@@ -257,10 +257,30 @@ bool is_folder_empty(uint32_t parent_cluster_number);
 
 void get_curr_working_dir(uint32_t cur_cluster, struct FAT32DirectoryTable *dir_table);
 
+/**
+ * FAT32 delete_all, delete a file or directory and everything inside it in file system.
+ *
+ * @param request buf and buffer_size is unused
+ * @return Error code: 0 success - 1 not found - -1 unknown
+ */
 int8_t delete_all(struct FAT32DriverRequest request);
 
 void delete_all_folder(uint32_t fat_index);
 
 void delete_all_file(uint32_t fat_index);
+
+/**
+ * FAT32 move, move file or folder only by changing the directory entry.
+ *
+ * @param src_request file/folder source, buf and buffer_size is unused
+ * @param des_request file/folder target, buf and buffer_size is unused
+ * @return error code:
+ * return 0: operasi berhasil
+ * return 1: File/folder sumber tidak ditemukan
+ * return 2: File/folder tujuan duplikat
+ * return 3: Folder tujuan penuh
+ * return -1: error lain
+ */
+int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar_request);
 
 #endif

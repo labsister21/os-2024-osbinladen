@@ -321,7 +321,7 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
         .parent_cluster_number = goal_cluster,
         .buffer_size           = CLUSTER_SIZE,
     };
-
+    
     get_only_filename(goal, goalLength, req.name, req.ext);
 
     int retcode = 0;
@@ -520,12 +520,13 @@ int rmr(char* goal, int goalLength){
 * goal1 berisikan nama file tujuan
 * goal2 berisikan tujuan folder dan nama file baru setelah dipindah
 *
-* return 0: operasi berhasil
-* return 1: Bukan sebuah file
-* return 2: file tidak ditemukan
-* return 3: folder tujuan tidak ada
-* return 4: error lain
-*/
+ * return 0: operasi berhasil
+ * return 1: File/folder sumber tidak ditemukan
+ * return 2: File/folder tujuan duplikat
+ * return 3: Folder tujuan penuh
+ * return 4: Pindah ke diri sendiri
+ * return -1: error lain
+ */
 int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
     int source_cluster = get_final_parent_cluster(goal1, main_state.cwd_cluster_number);
     int dest_cluster = get_final_parent_cluster(goal2, main_state.cwd_cluster_number);
@@ -551,87 +552,58 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
         return 3;
     }
 
-    /* Pembacaan source file*/
+    /* Pemindahan file/folder*/
 
     struct ClusterBuffer temp = {0};
-    struct FAT32DriverRequest req = {
+    struct FAT32DriverRequest src_req = {
         .buf                   = &temp,
         .name                  = {0},
         .ext                   = {0},
         .parent_cluster_number = source_cluster,
         .buffer_size           = CLUSTER_SIZE,
     };
-    memcpy(req.name, source_name, 8);
-    memcpy(req.ext, source_ext, 3);
-
-    int retcode;
-    syscall(0, (uint32_t) &req, (uint32_t) &retcode, 0);
-
+    memcpy(src_req.name, source_name, 8);
+    memcpy(src_req.ext, source_ext, 3);
+    struct FAT32DriverRequest tar_req = {
+        .buf                   = &temp,
+        .name                  = {0},
+        .ext                   = {0},
+        .parent_cluster_number = dest_cluster,
+        .buffer_size           = CLUSTER_SIZE,
+    };
+    memcpy(tar_req.name, dest_name, 8);
+    memcpy(tar_req.ext, dest_ext, 3);
+    get_only_filename(goal1, goal1Length, src_req.name, src_req.ext);
+    get_only_filename(goal2, goal2Length, tar_req.name, tar_req.ext);
+    uint32_t retcode;
+    syscall(12, (uint32_t) &src_req, (uint32_t) &tar_req, (uint32_t) &retcode);
     switch (retcode){
         case 1 :
-            printToScreen("\n", color_to_int(WHITE));
+            printToScreen("\nFile/folder '", color_to_int(GREEN));
             printToScreen(goal1, color_to_int(GREEN));
-            printToScreen(" bukan sebuah file\n", color_to_int(GREEN));
+            printToScreen("' tidak ditemukan\n", color_to_int(GREEN));
             return 1;
         case 2 :
-            printToScreen("\nfile ", color_to_int(GREEN));
+            printToScreen("\nFile/folder dengan nama dan ekstensi ", color_to_int(GREEN));
             printToScreen(goal1, color_to_int(GREEN));
-            printToScreen(" tidak ditemukan\n", color_to_int(GREEN));
+            printToScreen(" sudah ada di folder tujuan\n", color_to_int(GREEN));
             return 2;
-        case -1 :
-            printToScreen("\nterjadi anomali pada pembacaan file ", color_to_int(GREEN));
-            printToScreen(goal1, color_to_int(GREEN));
-            printToScreen("\n", color_to_int(GREEN));
+        case 3 :
+            printToScreen("\nFolder tujuan penuh\n ", color_to_int(GREEN));
             return 3;
+        case 4 :
+            printToScreen("\nTidak dapat memindah '",color_to_int(GREEN));
+            printToScreen(goal1,color_to_int(GREEN));
+            printToScreen("' ke dirinya sendiri\n",color_to_int(GREEN));
+            return 4;
         case 0:
-            break;
-        default:
-            return 3;
-    }
-
-    /*Pembuatan copy dari source file*/
-    
-    req.parent_cluster_number = dest_cluster;
-    memcpy(req.name, dest_name, 8);
-    memcpy(req.ext, dest_ext, 3);
-    syscall(2, (uint32_t) &req, (uint32_t) &retcode, 0);
-
-    switch (retcode){
-        case 1 :
-            printToScreen("\nFile dengan nama ", color_to_int(GREEN));
-            printToScreen(goal2, color_to_int(GREEN));
-            printToScreen(" sudah ada\n", color_to_int(GREEN));
-            return 1;
-        case 2 :
-            printToScreen("\nanomali\n", color_to_int(GREEN));
-            return 2;
-        case -1 :
-            printToScreen("\nterjadi anomali pada pembuatan file ", color_to_int(GREEN));
-            printToScreen(goal2, color_to_int(GREEN));
-            printToScreen("\n", color_to_int(GREEN));
-            return 3;
-        case 0:
-            break;
-        default:
-            return 3;
-    }
-
-    /* Penghapusan file lama*/
-    req.parent_cluster_number = source_cluster;
-    memcpy(req.name, source_name, 8);
-    memcpy(req.ext, source_ext, 3);
-    syscall(3, (uint32_t) &req, (uint32_t) &retcode, 0);
-
-    switch (retcode){
-        case 0:
-            printToScreen("\nMove berhasil\n", color_to_int(GREEN));
+            printToScreen("\nmove berhasil\n", color_to_int(GREEN));
             return 0;
         default:
-            printToScreen("\nAnomali saat penghapusan file lama", color_to_int(GREEN));
-            return 3;
+            printToScreen("\nAnomali dalam pemindahan\n",color_to_int(GREEN));
+            return -1;
     }
-
-    return 3;
+    return -1;
 }
 
 /*

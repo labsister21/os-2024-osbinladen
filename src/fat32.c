@@ -338,7 +338,7 @@ int8_t delete(struct FAT32DriverRequest request) {
         return -1;
     }
     int index = -1;
-    unsigned int i = 1;
+    unsigned int i = 2;
 
     while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && index == -1) {
         if (memcmp(driver_state.dir_table_buf.table[i].name, request.name, 8) == 0 &&
@@ -424,7 +424,7 @@ int8_t delete_all(struct FAT32DriverRequest request){
         return -1;
     }
     int index = -1;
-    unsigned int i = 1;
+    unsigned int i = 2;
 
     // search file/folder with requested name
     while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && index == -1) {
@@ -485,4 +485,87 @@ void delete_all_file(uint32_t fat_index){
     memset(empty_cluster, 0, CLUSTER_SIZE);
     write_clusters(empty_cluster, fat_index, 1);
     driver_state.fat_table.cluster_map[fat_index] == FAT32_FAT_EMPTY_ENTRY;
+}
+
+/**
+ * FAT32 move, move file or folder only by changing the directory entry.
+ *
+ * @param src_request file/folder source, buf and buffer_size is unused
+ * @param des_request file/folder target, buf and buffer_size is unused
+ * @return error code:
+ * return 0: operasi berhasil
+ * return 1: File/folder sumber tidak ditemukan
+ * return 2: File/folder tujuan duplikat
+ * return 3: Folder tujuan penuh
+ * return 4: Pindah ke diri sendiri
+ * return -1: error lain
+ */
+int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar_request){
+    // search source
+    read_clusters(driver_state.dir_table_buf.table, src_request.parent_cluster_number, 1);
+    if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY) {
+        return -1;
+    }
+    int index = -1;
+
+    // search file/folder with requested name
+    int src_index = -1;
+    unsigned int i = 0;
+    while ((i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry)) && src_index == -1) {
+        if (memcmp(driver_state.dir_table_buf.table[i].name, src_request.name, 8) == 0 &&
+            memcmp(driver_state.dir_table_buf.table[i].ext, src_request.ext, 3) == 0) {
+            src_index = i;
+        } else {
+            i++;
+        }
+    }
+
+    if (src_index == -1) {
+        return 1;
+    }
+    
+    // check if file with same name and extension exist
+    struct FAT32DirectoryEntry target_dir_table[CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry)];
+    read_clusters(target_dir_table, tar_request.parent_cluster_number, 1);
+    int tar_index  = 64;
+    i = 2;
+    while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && tar_index == 64) {
+        if(target_dir_table[i].user_attribute == UATTR_NOT_EMPTY){
+            if (memcmp(target_dir_table[i].name, src_request.name, 8) == 0 &&
+                memcmp(target_dir_table[i].ext, src_request.ext, 3) == 0) {
+                tar_index = -1;
+            }
+        } else {
+            tar_index = i;
+        }
+        i+=1;
+    }
+
+    if(tar_index == -1){
+        return 2;
+    }
+    if (tar_index == 64) {
+        return 3;
+    }
+
+    // // check if it move to itself
+    struct FAT32DirectoryEntry source = driver_state.dir_table_buf.table[src_index];
+    // uint32_t source_cluster_number = source.cluster_low | ((unsigned int)source.cluster_high << 16);
+    // if(source_cluster_number == tar_request.parent_cluster_number){
+    //     return 4;
+    // }
+
+    // move to destined folder
+    struct FAT32DirectoryEntry new_directory_entry = source;
+    memcpy(new_directory_entry.name, tar_request.name, 8);
+    memcpy(new_directory_entry.ext, tar_request.ext, 3);
+    target_dir_table[tar_index] = new_directory_entry;
+
+    // delete on old folder
+    struct FAT32DirectoryEntry empty_entry = {0};
+    driver_state.dir_table_buf.table[src_index] = empty_entry;
+    
+    write_clusters(&driver_state.dir_table_buf, src_request.parent_cluster_number, 1);
+    write_clusters(&target_dir_table, tar_request.parent_cluster_number, 1);
+    return  0;
 }
