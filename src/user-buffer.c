@@ -153,8 +153,8 @@ void inputChar(char c){
           handle_backspace();
           break;
         case 0x11:
-            handle_up_arrow();
-            break;
+          handle_up_arrow();
+          break;
         default:
           handle_others(c);
           break;
@@ -165,13 +165,12 @@ void inputChar(char c){
 void appendChar(){
     int current_string = 0;
     int current_char = 0;
-    memset(main_state.stringBuffer, 0, getArrayLength(main_state.stringBuffer,256));
-    for (int i = 0; i < getArrayLength(main_state.userBuffer,256); i++) {
+    memset(main_state.stringBuffer, 0, strlen(main_state.userBuffer));
+    for (int i = 0; i < strlen(main_state.userBuffer); i++) {
         if (main_state.userBuffer[i] == '\n') {
-            if (current_char != 0) {  // Avoid adding empty strings if \n appears at the start or consecutively
-                main_state.stringBuffer[current_string][current_char] = '\0';  // Null-terminate the current string
-                current_string++;  // Move to the next string in the array
-                current_char = 0;  // Reset character position for the new string
+            if (current_char != 0) { 
+                main_state.stringBuffer[current_string][current_char] = '\0'; 
+                current_char = 0;
             }
         } else {
             if (current_char < 256) {
@@ -201,15 +200,15 @@ void deleteLine(){
 }
 
 void handle_up_arrow(){
-    // if(main_state.last_index_arrow == 0){
-    //     return;
-    // }
-    // deleteLine();
-    // main_state.last_index_arrow--;
-    // int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
-    // for (int i = 0; i < length; i++) {
-    //     inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
-    // }
+    if(main_state.last_index_arrow == 0){
+        return;
+    }
+    deleteLine();
+    main_state.last_index_arrow--;
+    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+    for (int i = 0; i < length; i++) {
+        inputChar(main_state.stringBuffer[main_state.last_index_arrow][i]);
+    }
 }
 
 void handle_down_arrow(){
