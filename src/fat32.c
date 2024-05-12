@@ -550,10 +550,10 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
 
     // // check if it move to itself
     struct FAT32DirectoryEntry source = driver_state.dir_table_buf.table[src_index];
-    // uint32_t source_cluster_number = source.cluster_low | ((unsigned int)source.cluster_high << 16);
-    // if(source_cluster_number == tar_request.parent_cluster_number){
-    //     return 4;
-    // }
+    uint32_t source_cluster_number = source.cluster_low | ((unsigned int)source.cluster_high << 16);
+    if(source_cluster_number == tar_request.parent_cluster_number){
+        return 4;
+    }
 
     // move to destined folder
     struct FAT32DirectoryEntry new_directory_entry = source;

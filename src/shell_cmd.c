@@ -530,16 +530,16 @@ int rmr(char* goal, int goalLength){
 int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
     int source_cluster = get_final_parent_cluster(goal1, main_state.cwd_cluster_number);
     int dest_cluster = get_final_parent_cluster(goal2, main_state.cwd_cluster_number);
-    char source_name[8], dest_name[8], source_ext[3], dest_ext[3];
+    char source_name[8]={0}, dest_name[8]={0}, source_ext[3]={0}, dest_ext[3]={0};
     get_only_filename(goal1, goal1Length, source_name, source_ext);
     get_only_filename(goal2, goal2Length, dest_name, dest_ext);
     if(source_cluster == dest_cluster){
         if(isStrEqual(source_name, dest_name) && isStrEqual(source_ext, dest_ext)){
+            printToScreen("'merupakan file yang sama\n", color_to_int(GREEN));    
             printToScreen("\n'", color_to_int(GREEN));
             printToScreen(goal1, color_to_int(GREEN));
             printToScreen("' dan '", color_to_int(GREEN));
             printToScreen(goal2, color_to_int(GREEN));
-            printToScreen("'merupakan file yang sama\n", color_to_int(GREEN));    
             return 4;
         }
     }
@@ -573,8 +573,6 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length){
     };
     memcpy(tar_req.name, dest_name, 8);
     memcpy(tar_req.ext, dest_ext, 3);
-    get_only_filename(goal1, goal1Length, src_req.name, src_req.ext);
-    get_only_filename(goal2, goal2Length, tar_req.name, tar_req.ext);
     uint32_t retcode;
     syscall(12, (uint32_t) &src_req, (uint32_t) &tar_req, (uint32_t) &retcode);
     switch (retcode){
