@@ -105,12 +105,24 @@ void handle_down_arrow(){
   }
 }
 
+
 void handle_left_arrow(){
-  pos--;
+    if (charBuffer[pos-3] != '$') {
+        pos--; 
+        char temp = charBuffer[pos];
+        charBuffer[pos+1] = charBuffer[pos];
+        draw_char_at(temp, (pos + 1) / TEXT_WIDTH, (pos + 1) % TEXT_WIDTH, WHITE, BLACK);
+       
+    }
 }
 
 void handle_right_arrow(){
-  pos++;
+  if(charBuffer[pos+1]!= '\0'){
+    pos++;
+    char temp = charBuffer[pos];
+    charBuffer[pos-1] = temp;
+     draw_char_at(temp, (pos - 1) / TEXT_WIDTH, (pos - 1) % TEXT_WIDTH, WHITE, BLACK);
+  }
 }
 
 void key_handler(char c){
@@ -161,5 +173,5 @@ void puts(char* buffer, int charCount, uint16_t textColor){
 }
 
 void draw_cursor(){
-    draw_char_at('_', pos/TEXT_WIDTH, pos % TEXT_WIDTH, WHITE, BLACK);
+    draw_char_at('|', pos/TEXT_WIDTH, pos % TEXT_WIDTH, BLUE, BLACK);
 }
