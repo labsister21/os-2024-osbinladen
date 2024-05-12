@@ -111,7 +111,7 @@ void cmdHandler(){
 void handle_newline(){
   main_state.userBuffer[main_state.userBufferPos] = '\n';
   appendChar();
-  main_state.last_index_arrow = len(main_state.stringBuffer);
+  main_state.last_index_arrow = getArrayLength(main_state.stringBuffer,256);
   main_state.userBufferPos++;
   get_next_word();
   cmdHandler();
@@ -163,8 +163,8 @@ void inputChar(char c){
 void appendChar(){
     int current_string = 0;
     int current_char = 0;
-    memset(main_state.stringBuffer, 0, len(main_state.stringBuffer));
-    for (int i = 0; i < len(main_state.userBuffer); i++) {
+    memset(main_state.stringBuffer, 0, getArrayLength(main_state.stringBuffer,256));
+    for (int i = 0; i < getArrayLength(main_state.userBuffer,256); i++) {
         if (main_state.userBuffer[i] == '\n') {
             if (current_char != 0) {  // Avoid adding empty strings if \n appears at the start or consecutively
                 main_state.stringBuffer[current_string][current_char] = '\0';  // Null-terminate the current string
@@ -177,6 +177,16 @@ void appendChar(){
             }
         }
     }
+}
+
+int getArrayLength(char *arr[], int maxSize) {
+    int count = 0;
+    for (int i = 0; i < maxSize; i++) {
+        if (arr[i] != NULL) {
+            count++;
+        }
+    }
+    return count;
 }
 
 void deleteLine(){
@@ -201,7 +211,7 @@ void handle_up_arrow(){
 }
 
 void handle_down_arrow(){
-    if(main_state.last_index_arrow == len(main_state.stringBuffer)){
+    if(main_state.last_index_arrow == getArrayLength(main_state.stringBuffer, 256)){
         return;
     }
     deleteLine();
