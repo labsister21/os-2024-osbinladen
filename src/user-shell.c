@@ -31,7 +31,7 @@ int main(void) {
     char buffen;
     reset_user_buffer();
     syscall(7, 0, 0, 0);
-    printToScreen("user@OSBINLADEN:~ ", color_to_int(GREEN));
+    printToScreen("user@OSBINLADEN: ", color_to_int(GREEN));
     print_path_from_root(main_state.cwd_cluster_number, color_to_int(LIGHT_BLUE));
     printToScreen(" ", color_to_int(BLACK));
     while (true) {

@@ -2,7 +2,7 @@
 
 void print_path_from_root(int cluster_number, uint16_t Color){
     if (cluster_number == ROOT_CLUSTER_NUMBER){
-        printToScreen("$/", Color);
+        printToScreen("~$", Color);
         return;
     }
     struct FAT32DirectoryTable dir_table;
@@ -11,6 +11,7 @@ void print_path_from_root(int cluster_number, uint16_t Color){
     print_path_from_root(new_cluster, Color);
     printToScreen(dir_table.table[0].name, Color);
     printToScreen("/", Color);
+    printToScreen("$",Color);
 }
 
 void get_parent(char* path, char* parent){

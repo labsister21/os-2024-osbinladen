@@ -107,7 +107,7 @@ void handle_down_arrow(){
 
 
 void handle_left_arrow(){
-    if (charBuffer[pos-3] != '$') {
+    if (charBuffer[pos-2] != '$') {
         pos--; 
         char temp = charBuffer[pos];
         charBuffer[pos+1] = charBuffer[pos];
