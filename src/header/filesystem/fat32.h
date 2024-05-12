@@ -257,4 +257,10 @@ bool is_folder_empty(uint32_t parent_cluster_number);
 
 void get_curr_working_dir(uint32_t cur_cluster, struct FAT32DirectoryTable *dir_table);
 
+int8_t delete_all(struct FAT32DriverRequest request);
+
+void delete_all_folder(uint32_t fat_index);
+
+void delete_all_file(uint32_t fat_index);
+
 #endif
