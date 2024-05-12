@@ -204,7 +204,7 @@ int mkdir(char *goal, int goalLength){
         .buffer_size           = 0,
     };
 
-    if(memcmp(goal, "", 0)){
+    if(memcmp(goal, 0x0, 1) == 0){
         return 3;
     }
 
