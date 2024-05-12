@@ -167,7 +167,7 @@ void print_cur_dir(struct FAT32DirectoryTable dir_table){
         }
         if(dir_table.table[i].user_attribute == UATTR_NOT_EMPTY){
                 if(dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
-                    printToScreen(dir_table.table[i].name, color_to_int(BLUE));
+                    printToScreen(dir_table.table[i].name, color_to_int(LIGHT_BLUE));
                
                     printToScreen("    ", color_to_int(WHITE));
                 }
