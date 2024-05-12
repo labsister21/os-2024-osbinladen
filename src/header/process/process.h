@@ -79,6 +79,36 @@ typedef enum PROCESS_STATE {
 } PROCESS_STATE;
 
 /**
+ * Structure data containing information about a process
+ *
+ * @param metadata Process metadata, contain various information about process
+ * @param context  Process context used for context saving & switching
+ * @param memory   Memory used for the process
+ */
+
+typedef struct {
+    int pid;                      
+    char process_name[256];        
+    int priority;   
+    PROCESS_STATE state;               
+} ProcessMetadata;
+
+typedef struct {
+    void *virtual_addr_used[PROCESS_PAGE_FRAME_COUNT_MAX];  
+    uint32_t page_frame_used_count;    
+} ProcessMemory;                  
+
+typedef struct ProcessControlBlock {
+    ProcessMetadata metadata;
+    Context context;
+    ProcessMemory memory;
+} ProcessControlBlock;
+
+// Deklarasi array statik PCB
+ProcessControlBlock _process_list[PROCESS_COUNT_MAX];
+
+
+/**
  * Get currently running process PCB pointer
  * 
  * @return Will return NULL if there's no running process
