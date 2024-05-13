@@ -7,6 +7,7 @@
 #include "header/driver/graphics.h"
 #include "header/user/user-buffer.h"
 #include "header/user/user-shell.h"
+#include "header/user/user-syscall.h"
 
 #define PROCESS_NAME_LENGTH_MAX                     32
 #define PROCESS_COUNT_MAX                           16
@@ -157,9 +158,6 @@ int kill(uint32_t pid);
 
 void clear();
 int rmr(char* goal, int goalLength);
-
-// ============================================ BATAS SUCI ===========================================
-void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);
 
 
 #endif

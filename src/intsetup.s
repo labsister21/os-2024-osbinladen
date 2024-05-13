@@ -1,6 +1,8 @@
 extern main_interrupt_handler
 global isr_stub_table
 
+nitip: dd 0
+
 ; Generic handler section for interrupt
 call_generic_handler:
     ; Expected stack state at this label

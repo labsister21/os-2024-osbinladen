@@ -34,9 +34,9 @@ process_context_switch:
     mov     edi, [ecx + 0x14]  ; Move edi value from ctx -gpt
 
     ; Move stack pointer (esp) and base pointer (ebp) from the struct (assuming stacked) -gpt
-    ; mov     esp, [ecx + 0x18]  ; Move esp value from ctx -gpt
-    ; mov     ebp, [ecx + 0x1C]  ; Move ebp value from ctx (might need adjustment if ebp is pushed later) -gpt
+    ; mov     esp, [ecx + 0x18]  ; Move esp value from ctx -
     ; actually gpt, biar iret yang menangani -dito
+    mov     ebp, [ecx + 0x1C]  ; Move ebp value from ctx (might need adjustment if ebp is pushed later) -gpt
 
     ; (Optional) Restore segment registers if used in the context switch (not common in modern systems) -gpt
     ; mov     cs, [ecx + 0x20]   ; Move cs value from ctx (if used) -gpt

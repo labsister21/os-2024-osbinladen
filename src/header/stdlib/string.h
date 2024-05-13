@@ -61,5 +61,6 @@ int isStrEqual(void* str1, void* str2);
 int strToInt(char* str);
 
 void intToStr(int num, char* res);
+void intToStrPad(int num, char* str, int bufferLength);
 
 #endif

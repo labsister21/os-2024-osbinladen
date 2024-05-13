@@ -103,3 +103,23 @@ void intToStr(int num, char* str) {
     str[i - 1 - j] = temp;
   }
 }
+
+void intToStrPad(int num, char* str, int bufferLength) {
+  int i = 0;
+
+  if (num == 0) {
+    str[i++] = '0';
+  }
+
+  for(int j = 0; j < bufferLength; j++) {
+    int digit = num % 10;
+    str[i++] = digit + '0';
+    num /= 10;
+  }
+
+  for (int j = 0; j < i / 2; j++) {
+    char temp = str[j];
+    str[j] = str[i - 1 - j];
+    str[i - 1 - j] = temp;
+  }
+}

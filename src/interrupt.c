@@ -6,6 +6,7 @@
 #include "header/filesystem/fat32.h"
 #include "header/driver/charframe.h"
 #include "header/process/process.h"
+#include "header/driver/cmos.h"
 
 void io_wait(void) {
     out(0x80, 0);
@@ -47,7 +48,7 @@ void main_interrupt_handler(struct InterruptFrame frame) {
             keyboard_isr();
             break;
         case PIC1_OFFSET + IRQ_TIMER:
-            timer_isr();
+            timer_isr(frame);
             break;
         case 0x30:
             syscall(frame);
@@ -151,31 +152,40 @@ void syscall(struct InterruptFrame frame) {
             break;
 
         /*
-        Syscall 13  : Destroy process
-        $ebx        : pid to be destroyed
-        $ecx        : unused
-        $edx        : retcode address
-        */
+         * Syscall 13  : Destroy process
+         * $ebx        : pid to be destroyed
+         * $ecx        : unused
+         * $edx        : retcode address
+         */
         case 13:
             *((int8_t*) frame.cpu.general.edx) = process_destroy(frame.cpu.general.ebx);
             break;
         /*
-        Syscall 14  : Create Process
-        $ebx        : request address
-        $ecx        : unused
-        $edx        : retcode address
-        */
+         * Syscall 14  : Create Process
+         * $ebx        : request address
+         * $ecx        : unused
+         * $edx        : retcode address
+         */
         case 14:
             process_create_user_process(*((struct FAT32DriverRequest*) frame.cpu.general.ebx));
             break;
         /*
-        Syscall 15  : get_all_processes
-        $ebx        : address to array of process metadata
-        $ecx        : unused
-        $edx        : unused
-        */
+         * Syscall 15  : get_all_processes
+         * $ebx        : address to array of process metadata
+         * $ecx        : unused
+         * $edx        : unused
+         */
        case 15:
             process_get_processes_info((ProcessMetadata*) frame.cpu.general.ebx);
+            break;
+        /*
+         * Syscall 16  : show_clock()
+         * $ebx        : unused
+         * $ecx        : unused
+         * $edx        : unused
+         */
+        case 16:
+            show_HMS();
             break;
     }
 }

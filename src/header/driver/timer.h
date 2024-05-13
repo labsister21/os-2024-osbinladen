@@ -9,7 +9,7 @@
 extern uint32_t tick_counter;
 extern uint32_t second_counter;
 
-void timer_isr();
+void timer_isr(struct InterruptFrame frame);
 void init_counter();
 uint32_t timer_get_second();
 uint32_t timer_get_tick();

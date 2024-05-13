@@ -6,6 +6,7 @@
 #include "header/filesystem/fat32.h"
 #include "header/driver/graphics.h"
 #include "header/user/user-shell.h"
+#include "header/user/user-syscall.h"
 
 extern struct ShellState main_state;
 
@@ -22,9 +23,9 @@ void handle_backspace();
 void handle_others(char key);
 void inputChar(char c);
 void deleteLine();
-void appendChar();
-void handle_down_arrow();
+// void appendChar();
+// void handle_down_arrow();
 int getArrayLength(char *arr[], int maxSize);
-void handle_up_arrow();
+// void handle_up_arrow();
 
 #endif

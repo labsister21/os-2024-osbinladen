@@ -119,8 +119,8 @@ void cmdHandler(){
 
 void handle_newline(){
   main_state.userBuffer[main_state.userBufferPos] = '\n';
-  appendChar();
-  main_state.last_index_arrow = getArrayLength(main_state.stringBuffer,256);
+//   appendChar();
+//   main_state.last_index_arrow = getArrayLength(main_state.stringBuffer,256);
   main_state.userBufferPos++;
   get_next_word();
   cmdHandler();
@@ -162,9 +162,9 @@ void inputChar(char c){
         case '\b':
           handle_backspace();
           break;
-        case 0x11:
-          handle_up_arrow();
-          break;
+        // case 0x11:
+        //   handle_up_arrow();
+        //   break;
         default:
           handle_others(c);
           break;
@@ -172,23 +172,23 @@ void inputChar(char c){
     }
 }
 
-void appendChar(){
-    int current_string = 0;
-    int current_char = 0;
-    memset(main_state.stringBuffer, 0, strlen(main_state.userBuffer));
-    for (int i = 0; i < strlen(main_state.userBuffer); i++) {
-        if (main_state.userBuffer[i] == '\n') {
-            if (current_char != 0) { 
-                main_state.stringBuffer[current_string][current_char] = '\0'; 
-                current_char = 0;
-            }
-        } else {
-            if (current_char < 256) {
-                main_state.stringBuffer[current_string][current_char++] = main_state.userBuffer[i];
-            }
-        }
-    }
-}
+// void appendChar(){
+//     int current_string = 0;
+//     int current_char = 0;
+//     memset(main_state.stringBuffer, 0, strlen(main_state.userBuffer));
+//     for (int i = 0; i < strlen(main_state.userBuffer); i++) {
+//         if (main_state.userBuffer[i] == '\n') {
+//             if (current_char != 0) { 
+//                 main_state.stringBuffer[current_string][current_char] = '\0'; 
+//                 current_char = 0;
+//             }
+//         } else {
+//             if (current_char < 256) {
+//                 main_state.stringBuffer[current_string][current_char++] = main_state.userBuffer[i];
+//             }
+//         }
+//     }
+// }
 
 int getArrayLength(char *arr[], int maxSize) {
     int count = 0;
@@ -209,26 +209,26 @@ void deleteLine(){
     }
 }
 
-void handle_up_arrow(){
-    if(main_state.last_index_arrow == 0){
-        return;
-    }
-    deleteLine();
-    main_state.last_index_arrow--;
-    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
-    for (int i = 0; i < length; i++) {
-        inputChar(main_state.stringBuffer[main_state.last_index_arrow][i]);
-    }
-}
+// void handle_up_arrow(){
+//     if(main_state.last_index_arrow == 0){
+//         return;
+//     }
+//     deleteLine();
+//     main_state.last_index_arrow--;
+//     int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+//     for (int i = 0; i < length; i++) {
+//         inputChar(main_state.stringBuffer[main_state.last_index_arrow][i]);
+//     }
+// }
 
-void handle_down_arrow(){
-    if(main_state.last_index_arrow == getArrayLength(main_state.stringBuffer, 256)){
-        return;
-    }
-    deleteLine();
-    main_state.last_index_arrow++;
-    int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
-    for (int i = 0; i < length; i++) {
-        inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
-    }
-}
+// void handle_down_arrow(){
+//     if(main_state.last_index_arrow == getArrayLength(main_state.stringBuffer, 256)){
+//         return;
+//     }
+//     deleteLine();
+//     main_state.last_index_arrow++;
+//     int length = strlen(main_state.stringBuffer[main_state.last_index_arrow]);
+//     for (int i = 0; i < length; i++) {
+//         inputChar (main_state.stringBuffer[main_state.last_index_arrow][i]);
+//     }
+// }

@@ -66,6 +66,7 @@ kernel:
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/process.c -o $(OUTPUT_FOLDER)/process.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/timer.c -o $(OUTPUT_FOLDER)/timer.o
 	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/scheduler.c -o $(OUTPUT_FOLDER)/scheduler.o
+	$(CC) $(CFLAGS) $(SOURCE_FOLDER)/cmos.c -o $(OUTPUT_FOLDER)/cmos.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/intsetup.s -o $(OUTPUT_FOLDER)/intsetup.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/asmGaming.s -o $(OUTPUT_FOLDER)/asmGaming.o
 	$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/context_switch.s -o $(OUTPUT_FOLDER)/context_switch.o
@@ -96,17 +97,32 @@ user-shell:
 	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/stdlib/string.c -o string.o
 	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/user-buffer.c -o user-buffer.o
 	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/shell_cmd.c -o shell_cmd.o
+	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/user-syscall.c -o user-syscall.o
 	@$(LIN) -T $(SOURCE_FOLDER)/user-linker.ld -melf_i386 --oformat=binary \
-		crt0.o user-shell.o string.o user-buffer.o shell_cmd.o -o $(OUTPUT_FOLDER)/shell
+		crt0.o user-shell.o string.o user-buffer.o shell_cmd.o user-syscall.o -o $(OUTPUT_FOLDER)/shell
 	@echo Linking object shell object files and generate flat binary...
 	@$(LIN) -T $(SOURCE_FOLDER)/user-linker.ld -melf_i386 --oformat=elf32-i386 \
-		crt0.o user-shell.o string.o user-buffer.o shell_cmd.o -o $(OUTPUT_FOLDER)/shell_elf
+		crt0.o user-shell.o string.o user-buffer.o shell_cmd.o user-syscall.o -o $(OUTPUT_FOLDER)/shell_elf
 	@echo Linking object shell object files and generate ELF32 for debugging...
 	@size --target=binary $(OUTPUT_FOLDER)/shell
+	@rm -f *.o
+
+user-clock:
+	@$(ASM) $(AFLAGS) $(SOURCE_FOLDER)/crt0.s -o crt0.o
+	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/user-syscall.c -o user-syscall.o
+	@$(CC)  $(CFLAGS) -fno-pie $(SOURCE_FOLDER)/user-clock.c -o user-clock.o
+	@$(LIN) -T $(SOURCE_FOLDER)/user-linker.ld -melf_i386 --oformat=binary \
+		crt0.o user-syscall.o user-clock.o -o $(OUTPUT_FOLDER)/clock
+	@echo Linking object shell object files and generate flat binary...
+	@size --target=binary $(OUTPUT_FOLDER)/clock
 	@rm -f *.o
 
 insert-shell: inserter user-shell
 	@echo Inserting shell into root directory...
 	@cd $(OUTPUT_FOLDER); ./inserter shell 2 $(DISK_NAME).bin
 
-lock1: disk insert-shell run
+insert-clock: user-clock
+	@echo Inserting clock into root directory...
+	@cd $(OUTPUT_FOLDER); ./inserter clock 2 $(DISK_NAME).bin
+
+lock1: disk insert-shell insert-clock run

@@ -15,6 +15,7 @@
 #include "imgdata/attack.h"
 #include "header/process/process.h"
 #include "header/scheduler/scheduler.h"
+#include "header/driver/cmos.h"
 
 //void kernel_setup(void) {
 //     uint32_t a;

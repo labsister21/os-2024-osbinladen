@@ -171,6 +171,8 @@ struct PageDirectory* paging_create_new_page_directory(void) {
             page_directory_list[i].table[0x300].lower_address = 0;
             page_directory_list[i].table[0x301].flag = flag;
             page_directory_list[i].table[0x301].lower_address = 1;
+            page_directory_list[i].table[0x302].flag = flag;
+            page_directory_list[i].table[0x302].lower_address = 2;
             page_directory_list[i].table[0x3F4].flag = flag;
             page_directory_list[i].table[0x3F4].lower_address = 0x3F4;
             page_directory_list[i].table[0x3F5].flag = flag;

@@ -6,10 +6,10 @@
 #include "header/filesystem/fat32.h"
 #include "header/stdlib/string.h"
 #include "header/driver/graphics.h"
+#include "header/user/user-syscall.h"
 
 struct ShellState {
     char    userBuffer[TEXT_HEIGHT*TEXT_WIDTH];
-    char    stringBuffer[256][256];
     int     userBufferPos;
     int     readPointer;
     char    currentWord[64];

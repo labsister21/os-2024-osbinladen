@@ -57,6 +57,7 @@ for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
             }
 
             memset(&process_manager_state.process_list[i], 0, sizeof(ProcessControlBlock));
+            process_manager_state.active_process_count--;
             return true;
         }
     }
