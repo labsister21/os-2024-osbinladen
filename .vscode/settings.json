@@ -25,6 +25,7 @@
         "process.h": "c",
         "timer.h": "c",
         "paging.h": "c",
-        "user-syscall.h": "c"
+        "user-syscall.h": "c",
+        "gdt.h": "c"
     },
 }

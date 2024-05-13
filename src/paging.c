@@ -119,7 +119,7 @@ bool paging_allocate_user_page_frame(struct PageDirectory *page_dir, void *virtu
         .use_pagesize_4_mb = 1,
     };
 
-    for(int j = 0; j < 16; j++){
+    for(int j = 0; j < 1; j++){
         update_page_directory_entry(page_dir, (void*)(i*PAGE_FRAME_SIZE) + j*2048, virtual_addr + j*2048, newFlag);
     }
 
@@ -171,8 +171,6 @@ struct PageDirectory* paging_create_new_page_directory(void) {
             page_directory_list[i].table[0x300].lower_address = 0;
             page_directory_list[i].table[0x301].flag = flag;
             page_directory_list[i].table[0x301].lower_address = 1;
-            page_directory_list[i].table[0x302].flag = flag;
-            page_directory_list[i].table[0x302].lower_address = 2;
             page_directory_list[i].table[0x3F4].flag = flag;
             page_directory_list[i].table[0x3F4].lower_address = 0x3F4;
             page_directory_list[i].table[0x3F5].flag = flag;

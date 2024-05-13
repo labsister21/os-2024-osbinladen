@@ -699,10 +699,8 @@ void clear(){
  */
 int exec(char* filePath){
 
-    struct ClusterBuffer temp[4] = {0};
-
     struct FAT32DriverRequest req = {
-        .buf                   = &temp,
+        .buf                   = (uint8_t*) 0,
         .name                  = {0},
         .ext                   = {0},
         .parent_cluster_number = main_state.cwd_cluster_number,

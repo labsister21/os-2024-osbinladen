@@ -15,7 +15,7 @@ void timer_isr(struct InterruptFrame frame){
     }
     pic_ack(PIC1_OFFSET + IRQ_TIMER);
 
-    if (process_manager_state.active_process_count > 0){
+    if (process_manager_state.active_process_count > 1 && tick_counter % 10 == 0){
         ProcessControlBlock* currPcb = process_get_current_running_pcb_pointer();
         Context currContext = currPcb->context;
         currContext.cpu.eax = frame.cpu.general.eax;
