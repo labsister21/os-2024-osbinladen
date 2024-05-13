@@ -3,8 +3,10 @@
 #include "header/stdlib/string.h"
 #include "header/cpu/gdt.h"
 
-ProcessManagerState process_manager_state;
-
+ProcessManagerState process_manager_state = {
+    .active_process_count = 0,
+    .process_list = 0,
+};
 static int32_t next_pid = 1; 
 
 int32_t process_generate_new_pid() {
@@ -37,21 +39,21 @@ struct ProcessControlBlock* process_get_current_running_pcb_pointer() {
 }
 
 bool process_destroy(uint32_t pid) {
-    for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
+for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
         if (process_manager_state.process_list[i].metadata.pid == pid && process_manager_state.process_list[i].metadata.state != TERMINATED) {
+
             process_manager_state.process_list[i].metadata.state = TERMINATED;
 
             if (!paging_free_page_directory(process_manager_state.process_list[i].context.page_directory_virtual_addr)) {
                 return false;
             }
 
-            memset(&process_manager_state.process_list[i], 0, sizeof(ProcessControlBlock));  // Use memset to zero out the PCB
+            memset(&process_manager_state.process_list[i], 0, sizeof(ProcessControlBlock));
             return true;
         }
     }
-    return false; 
+    return false;
 }
-
 int32_t process_create_user_process(struct FAT32DriverRequest request) {
     int32_t retcode = PROCESS_CREATE_SUCCESS; 
     if (process_manager_state.active_process_count >= PROCESS_COUNT_MAX) {
@@ -77,6 +79,35 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
     struct ProcessControlBlock *new_pcb = &(process_manager_state.process_list[p_index]);
 
     new_pcb->metadata.pid = process_generate_new_pid();
+
+    struct PageDirectory* allocatedPage = paging_create_new_page_directory();
+
+    new_pcb->context.page_directory_virtual_addr = allocatedPage;
+    new_pcb->metadata.state = NEW;
+    new_pcb->context.cpu.eflags = CPU_EFLAGS_BASE_FLAG | CPU_EFLAGS_FLAG_INTERRUPT_ENABLE;
+
+    struct PageDirectory* currentPageDirectory = paging_get_current_page_directory_addr();
+
+    paging_allocate_user_page_frame(allocatedPage, request.buf);
+
+    paging_use_page_directory(allocatedPage);
+    int fsretcode = read(request);
+
+    if (fsretcode != 0){
+        process_destroy(new_pcb->metadata.pid);
+        paging_use_page_directory(currentPageDirectory);
+        retcode = PROCESS_CREATE_FAIL_FS_READ_FAILURE;
+        goto exit_cleanup;
+    }
+
+    paging_use_page_directory(currentPageDirectory);
+
+    new_pcb->context.cpu.cs = 0x20;
+    new_pcb->context.cpu.ds = 0x20;
+    new_pcb->context.cpu.es = 0x20;
+    new_pcb->context.cpu.ss = 0x20;
+    new_pcb->context.cpu.fs = 0x20;
+    new_pcb->context.cpu.gs = 0x20;
 
 exit_cleanup:
     return retcode;

@@ -71,11 +71,11 @@ typedef struct Context {
 
 
 typedef enum PROCESS_STATE {
-    READY,
+    NEW,
     RUNNING,
     WAITING,
     TERMINATED,
-    NEW
+    READY
 } PROCESS_STATE;
 
 /**
@@ -87,7 +87,7 @@ typedef enum PROCESS_STATE {
  */
 
 typedef struct {
-    int pid;                      
+    uint32_t pid;                      
     char process_name[256];        
     int priority;   
     PROCESS_STATE state;               
@@ -106,8 +106,10 @@ typedef struct ProcessControlBlock {
 
 typedef struct {
     int active_process_count; 
-    ProcessControlBlock process_list[PROCESS_COUNT_MAX];
+    ProcessControlBlock process_list[PROCESS_COUNT_MAX]; 
 } ProcessManagerState;
+
+extern ProcessManagerState process_manager_state;
 
 /**
  * Get currently running process PCB pointer
