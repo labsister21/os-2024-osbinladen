@@ -3,6 +3,8 @@
 #include "header/realModeGaming.h"
 #include "font/basicFont.h"
 #include "header/driver/keyboard.h"
+#include "imgdata/attack.h"
+#include "header/driver/timer.h"
 
 int last_pos = 0;
 
@@ -78,6 +80,14 @@ void draw_null_char(int row, int column, Color16 bg){
                 text_col_to_pixel_col(column) + 7 - x,
                 bg
             );
+        }
+    }
+}
+
+void draw_title_screen(){
+    for(int row = 0; row < GRAPHICS_HEIGHT; row++){
+        for(int col = 0; col < GRAPHICS_WIDTH; col++){
+            draw_pixel_at_with_code(row, col, title[row*GRAPHICS_WIDTH + col]);
         }
     }
 }

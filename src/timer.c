@@ -48,3 +48,10 @@ uint32_t timer_get_second(){
 uint32_t timer_get_tick(){
     return tick_counter;
 }
+
+void sleep(uint32_t second){
+    uint32_t start_tick = tick_counter;
+    uint32_t start_second_counter = second_counter;
+
+    while(start_second_counter*1000 + 1000*second + start_tick - 1000*second_counter - tick_counter > 0){;}
+}

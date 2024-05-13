@@ -179,13 +179,41 @@ void syscall(struct InterruptFrame frame) {
             process_get_processes_info((ProcessMetadata*) frame.cpu.general.ebx);
             break;
         /*
-         * Syscall 16  : show_clock()
+         * Syscall 16  : show_time at bottom right
          * $ebx        : unused
          * $ecx        : unused
          * $edx        : unused
          */
         case 16:
             show_HMS();
+            break;
+        /*
+         * Syscall 17  : draw title screen
+         * $ebx        : unused
+         * $ecx        : unused
+         * $edx        : unused
+         */
+        case 17:
+            draw_title_screen();
+            break;
+        /*
+         * Syscall 18  : get time since program start
+         * $ebx        : second pointer
+         * $ecx        : milisecond pointer
+         * $edx        : unused
+         */
+        case 18:
+            *((uint32_t*)frame.cpu.general.ebx) = timer_get_second();
+            *((uint32_t*)frame.cpu.general.ecx) = timer_get_tick();
+            break;
+        /*
+         * Syscall 19  : clear screen
+         * $ebx        : unused
+         * $ecx        : unused
+         * $edx        : unused
+         */
+        case 19:
+            set_screen_color(BLACK);
             break;
     }
 }

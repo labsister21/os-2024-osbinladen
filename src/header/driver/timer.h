@@ -13,5 +13,6 @@ void timer_isr(struct InterruptFrame frame);
 void init_counter();
 uint32_t timer_get_second();
 uint32_t timer_get_tick();
+void sleep(uint32_t second);
 
 #endif

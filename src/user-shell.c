@@ -24,7 +24,10 @@ int main(void) {
     int32_t retcode;
     syscall(0, (uint32_t) &request, (uint32_t) &retcode, 0);
     if (retcode == 0)
-        syscall(6, (uint32_t) "Let's blow up the world\n\n", 26, color_to_int(GREEN));
+        syscall(17, 0, 0, 0);
+
+    sleep(2, 0);
+    syscall(19, 0, 0, 0);
 
     char buffen;
     reset_user_buffer();

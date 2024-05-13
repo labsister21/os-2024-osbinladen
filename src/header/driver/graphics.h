@@ -42,8 +42,7 @@ void* word_memset(void *s, int c, size_t n);
 void draw_pixel_at(int row, int column, Color16 color);
 void draw_pixel_at_with_code(int row, int column, uint16_t color);
 void draw_char_at(char c, int row, int column, Color16 fg, Color16 bg);
-int row_pos_to_pixel_row(int row);
-int col_pos_to_pixel_col(int col);
 void draw_null_char(int row, int column, Color16 bg);
+void draw_title_screen();
 
 #endif
