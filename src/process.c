@@ -1,5 +1,4 @@
 #include "header/process/process.h"
-#include "header/memory/paging.h"
 #include "header/stdlib/string.h"
 #include "header/cpu/gdt.h"
 
@@ -15,7 +14,7 @@ int32_t process_generate_new_pid() {
 
 int32_t process_list_get_inactive_index() {
     for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
-        if (process_manager_state.process_list[i].metadata.state == TERMINATED || process_manager_state.process_list[i].metadata.state == NEW) {
+        if (process_manager_state.process_list[i].metadata.state == TERMINATED) {
             return i;
         }
     }
@@ -44,7 +43,7 @@ for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
 
             process_manager_state.process_list[i].metadata.state = TERMINATED;
 
-            if (!paging_free_page_directory(process_manager_state.process_list[i].context.page_directory_virtual_addr)) {
+            if (!paging_free_page_directory((struct PageDirectory*) process_manager_state.process_list[i].context.page_directory_virtual_addr)) {
                 return false;
             }
 
@@ -79,10 +78,12 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
     struct ProcessControlBlock *new_pcb = &(process_manager_state.process_list[p_index]);
 
     new_pcb->metadata.pid = process_generate_new_pid();
+    memcpy(new_pcb->metadata.process_name, request.name, 8);
+    new_pcb->memory.page_frame_used_count = page_frame_count_needed;
 
     struct PageDirectory* allocatedPage = paging_create_new_page_directory();
 
-    new_pcb->context.page_directory_virtual_addr = allocatedPage;
+    new_pcb->context.page_directory_virtual_addr = (uint32_t) allocatedPage;
     new_pcb->metadata.state = NEW;
     new_pcb->context.cpu.eflags = CPU_EFLAGS_BASE_FLAG | CPU_EFLAGS_FLAG_INTERRUPT_ENABLE;
 
@@ -102,12 +103,14 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
 
     paging_use_page_directory(currentPageDirectory);
 
-    new_pcb->context.cpu.cs = 0x20;
-    new_pcb->context.cpu.ds = 0x20;
-    new_pcb->context.cpu.es = 0x20;
-    new_pcb->context.cpu.ss = 0x20;
-    new_pcb->context.cpu.fs = 0x20;
-    new_pcb->context.cpu.gs = 0x20;
+    new_pcb->context.cpu.esp = 0x400000 - 4;
+    new_pcb->context.cpu.cs = 0x1b;
+    new_pcb->context.cpu.ds = 0x23;
+    new_pcb->context.cpu.es = 0x23;
+    new_pcb->context.cpu.ss = 0x23;
+    new_pcb->context.cpu.fs = 0x23;
+    new_pcb->context.cpu.gs = 0x23;
+    process_manager_state.active_process_count++;
 
 exit_cleanup:
     return retcode;

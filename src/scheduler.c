@@ -1,7 +1,8 @@
 #include "header/scheduler/scheduler.h"
 #include "header/cpu/interrupt.h"
+#include "header/memory/paging.h"
 
-uint32_t current_tick = 0;
+int current_process_list_id = -1;
 
 /**
  * Read all general purpose register values and set control register.
@@ -18,7 +19,7 @@ __attribute__((noreturn)) extern void process_context_switch(struct Context ctx)
  * Initialize scheduler before executing init process 
  */
 void scheduler_init(void){
-    ;
+    current_process_list_id = -1;
 }
 
 /**
@@ -31,4 +32,22 @@ void scheduler_save_context_to_current_running_pcb(struct Context ctx);
 /**
  * Trigger the scheduler algorithm and context switch to new process
  */
-__attribute__((noreturn)) void scheduler_switch_to_next_process(void);
+__attribute__((noreturn)) void scheduler_switch_to_next_process(void){
+    if (current_process_list_id != -1){
+        process_manager_state.process_list[current_process_list_id].metadata.state = READY;
+    }
+    current_process_list_id++;
+
+    while(process_manager_state.process_list[current_process_list_id].metadata.state != READY){
+        if(process_manager_state.process_list[current_process_list_id].metadata.state == NEW){
+            process_manager_state.process_list[current_process_list_id].metadata.state = READY;
+        }
+        current_process_list_id++;
+        if (current_process_list_id >= PROCESS_COUNT_MAX){
+            current_process_list_id -= PROCESS_COUNT_MAX;
+        }
+    }
+
+    paging_use_page_directory((struct PageDirectory*) process_manager_state.process_list[current_process_list_id].context.page_directory_virtual_addr);
+    process_context_switch(process_manager_state.process_list[current_process_list_id].context);
+}

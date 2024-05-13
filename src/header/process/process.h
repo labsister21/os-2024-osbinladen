@@ -62,7 +62,7 @@ typedef struct AllCPURegister {
     unsigned int eip;                 // Instruction pointer
     unsigned int eflags;              // Flags register
     unsigned int cs, ds, es, fs, gs, ss; // Segment registers
-} AllCPURegister;
+} __attribute__((packed))  AllCPURegister;
 
 typedef struct Context {
     AllCPURegister cpu;                        // All CPU register states
@@ -71,10 +71,10 @@ typedef struct Context {
 
 
 typedef enum PROCESS_STATE {
-    NEW,
+    TERMINATED,
     RUNNING,
     WAITING,
-    TERMINATED,
+    NEW,
     READY
 } PROCESS_STATE;
 
@@ -88,7 +88,7 @@ typedef enum PROCESS_STATE {
 
 typedef struct {
     uint32_t pid;                      
-    char process_name[256];        
+    char process_name[PROCESS_NAME_LENGTH_MAX];        
     int priority;   
     PROCESS_STATE state;               
 } ProcessMetadata;

@@ -23,6 +23,7 @@
         "stdint.h": "c",
         "user-buffer.h": "c",
         "process.h": "c",
-        "timer.h": "c"
+        "timer.h": "c",
+        "paging.h": "c"
     },
 }

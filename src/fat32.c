@@ -477,14 +477,14 @@ void delete_all_folder(uint32_t fat_index){
     uint8_t empty_cluster[CLUSTER_SIZE];
     memset(empty_cluster, 0, CLUSTER_SIZE);
     write_clusters(empty_cluster, fat_index, 1);
-    driver_state.fat_table.cluster_map[fat_index] == FAT32_FAT_EMPTY_ENTRY;
+    // driver_state.fat_table.cluster_map[fat_index] == FAT32_FAT_EMPTY_ENTRY;
 }
 
 void delete_all_file(uint32_t fat_index){
     uint8_t empty_cluster[CLUSTER_SIZE];
     memset(empty_cluster, 0, CLUSTER_SIZE);
     write_clusters(empty_cluster, fat_index, 1);
-    driver_state.fat_table.cluster_map[fat_index] == FAT32_FAT_EMPTY_ENTRY;
+    // driver_state.fat_table.cluster_map[fat_index] == FAT32_FAT_EMPTY_ENTRY;
 }
 
 /**
@@ -506,7 +506,7 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY) {
         return -1;
     }
-    int index = -1;
+    // int index = -1;
 
     // search file/folder with requested name
     int src_index = -1;

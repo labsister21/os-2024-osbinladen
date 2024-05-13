@@ -12,8 +12,6 @@
  */
 __attribute__((noreturn)) extern void process_context_switch(struct Context ctx);
 
-
-
 /* --- Scheduler --- */
 /**
  * Initialize scheduler before executing init process 
