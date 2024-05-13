@@ -95,7 +95,17 @@ void cmdHandler(){
         else if(isStrEqual(main_state.currentWord, "clear")){
             clear();
         }
-     
+        else if(isStrEqual(main_state.currentWord, "exec")){
+            get_next_word();
+            exec(main_state.currentWord);
+        }
+        else if(isStrEqual(main_state.currentWord, "ps")){
+            ps();
+        }
+        else if(isStrEqual(main_state.currentWord, "kill")){
+            get_next_word();
+            kill(strToInt(main_state.currentWord));
+        }
         else{
             printToScreen("\n", color_to_int(BLACK));
             printToScreen(main_state.currentWord, color_to_int(GREEN));

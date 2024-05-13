@@ -4,7 +4,7 @@
 
 struct ShellState main_state = {
     .userBuffer = {0},
-    .stringBuffer = {0, 0},
+    .stringBuffer = {{0}},
     .currentWord = {0},
     .readPointer = 0,
     .userBufferPos = 0,

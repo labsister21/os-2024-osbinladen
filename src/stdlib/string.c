@@ -70,3 +70,36 @@ int isStrEqual(void* str1, void* str2){
     if (strlen(str1) != strlen(str2)) {return 0;}
     return memcmp(str1, str2, strlen(str1)) == 0;
 }
+
+int strToInt(char* str){
+    int i = 0;
+    int res = 0;
+    while (str[i] != 0x0){
+        res *= 10;
+        res += str[i] - '0';
+        i++;
+    }
+    return res;
+}
+
+void intToStr(int num, char* str) {
+  int i = 0;
+
+  if (num == 0) {
+    str[i++] = '0';
+  }
+
+  while (num > 0) {
+    int digit = num % 10;
+    str[i++] = digit + '0';
+    num /= 10;
+  }
+
+  str[i] = '\0';
+
+  for (int j = 0; j < i / 2; j++) {
+    char temp = str[j];
+    str[j] = str[i - 1 - j];
+    str[i - 1 - j] = temp;
+  }
+}

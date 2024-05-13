@@ -53,7 +53,7 @@ int get_deep_folder_cluster (char* path, int current_folder_cluster){
     
     for(int i = 1; i < 64; i++){
         if (isStrEqual(parent, dir_table.table[i].name) && dir_table.table[i].attribute == ATTR_SUBDIRECTORY){
-            if (dir_table.table[i].attribute != ATTR_SUBDIRECTORY && isStrEqual(dir_table.table[i].ext, '\0\0\0')){
+            if (dir_table.table[i].attribute != ATTR_SUBDIRECTORY && isStrEqual(dir_table.table[i].ext, "\0\0\0")){
                 return -1;
             }
             if (isStrEqual(path, parent)){
@@ -95,6 +95,7 @@ void parse_filename(char* file, int nameLength, char* nameDest, char* extDest){
 }
 
 void get_only_filename(char* filePath, int nameLength, char* name, char* ext){
+    (void)nameLength;
     char currentCandidate[12] = {0};
     int i = 0;
     int candidateIdx = 0;
@@ -121,7 +122,7 @@ void get_only_filename(char* filePath, int nameLength, char* name, char* ext){
 * return 3: error lain
 */
 int cd(char* goal, int goalLength){
-
+    (void)goalLength;
     struct FAT32DirectoryTable dir_table;
     syscall(10, main_state.cwd_cluster_number, (uint32_t)&dir_table, 0);
     int new_cluster = get_deep_folder_cluster(goal, main_state.cwd_cluster_number);
@@ -389,6 +390,7 @@ int cp(char* goal, int goalLength, char* dest, int destLength){
 * return 3: error lain
 */
 int rm(char* goal, int goalLength){
+    (void)goalLength;
     struct ClusterBuffer res = {0};
     struct FAT32DriverRequest req = {
         .buf                   = &res,
@@ -460,6 +462,7 @@ int rm(char* goal, int goalLength){
 * return 3: error lain
 */
 int rmr(char* goal, int goalLength){
+    (void)goalLength;
     struct ClusterBuffer res = {0};
     struct FAT32DriverRequest req = {
         .buf                   = &res,
@@ -681,10 +684,127 @@ void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, c
     }
 }
 
-
 void clear(){
     memset(main_state.userBuffer, 0, TEXT_HEIGHT*TEXT_WIDTH);
     syscall(11,0,0,0);
+}
+
+/*
+ * exec - Membuat proses baru, dengan executable ada pada filePath
+ *
+ *  return 0 : operasi berhasil
+ *  return 1 : file tidak ditemukan
+ *  return 2 : bukan file
+ *  return 3 : anomali
+ */
+int exec(char* filePath){
+
+    struct ClusterBuffer temp[4] = {0};
+
+    struct FAT32DriverRequest req = {
+        .buf                   = &temp,
+        .name                  = {0},
+        .ext                   = {0},
+        .parent_cluster_number = main_state.cwd_cluster_number,
+        .buffer_size           = 4*CLUSTER_SIZE,
+    };
+
+    get_only_filename(filePath, strlen(filePath), req.name, req.ext);
+
+    uint32_t retcode = 0;
+    syscall(14, (uint32_t) &req, 0, (uint32_t) &retcode);
+
+    switch(retcode){
+        case PROCESS_CREATE_FAIL_FS_READ_FAILURE:
+            printToScreen("\nGagal dalam pembacaan file\n", color_to_int(GREEN));
+            return 3;
+            break;
+        case PROCESS_CREATE_FAIL_INVALID_ENTRYPOINT:
+            printToScreen("\nEntrypoint sus\n", color_to_int(GREEN));
+            return 3;
+            break;
+        case PROCESS_CREATE_FAIL_MAX_PROCESS_EXCEEDED:
+            printToScreen("\nToo many process\n", color_to_int(GREEN));
+            return 3;
+            break;
+        case PROCESS_CREATE_FAIL_NOT_ENOUGH_MEMORY:
+            printToScreen("\nNot enough memory\n", color_to_int(GREEN));
+            return 3;
+            break;
+        case PROCESS_CREATE_SUCCESS:
+            printToScreen("\nPembuatan proses berhasil\n", color_to_int(GREEN));
+            return 0;
+        default:
+            printToScreen("\nTerjadi Anomali\n", color_to_int(GREEN));
+            return 3;
+    }
+}
+
+/*
+ *  ps - Menunjukkan informasi proses yang sedang berjalan
+ *
+ */
+void ps(){
+    ProcessMetadata metadatas[PROCESS_COUNT_MAX] = {0};
+    syscall(15, (uint32_t) &metadatas, 0, 0);
+
+    for(int i = 0; i < PROCESS_COUNT_MAX; i++){
+        if (metadatas[i].pid == 0){
+            break;
+        }
+        else{
+            char temp[11] = {0};
+            printToScreen("\n\nProcess ", color_to_int(GREEN));
+            printToScreen(metadatas[i].process_name, color_to_int(GREEN));
+            printToScreen("\nProcess ID (pid) : ", color_to_int(GREEN));
+            memset(temp, 0, 11);
+            intToStr(metadatas[i].pid, temp);
+            printToScreen(temp, color_to_int(GREEN));
+            printToScreen("\nPriority : ", color_to_int(GREEN));
+            memset(temp, 0, 11);
+            intToStr(metadatas[i].priority, temp);
+            printToScreen(temp, color_to_int(GREEN));
+            printToScreen("\nState : ", color_to_int(GREEN));
+
+            switch(metadatas[i].state){
+                case NEW:
+                    printToScreen("NEW\n", color_to_int(GREEN));
+                    break;
+                case RUNNING:
+                    printToScreen("RUNNING\n", color_to_int(GREEN));
+                    break;
+                case WAITING:
+                    printToScreen("WAITING\n", color_to_int(GREEN));
+                    break;
+                case READY:
+                    printToScreen("READY\n", color_to_int(GREEN));
+                    break;
+                default:
+                    printToScreen("Anomalous State\n", color_to_int(GREEN));
+                    break;
+            }
+        }
+    }
+}
+
+/*
+ *  kill - Menghentikan proses dengan process id = pid
+ *
+ *  return 0 : operasi berhasil
+ *  return 1 : pid tidak ditemukan
+ *  return 3 : anomali
+ */
+int kill(uint32_t pid){
+    uint32_t retcode = 0;
+    syscall(13, pid, 0, (uint32_t) &retcode);
+    if (retcode){
+        printToScreen("\nPembunuhan berhasil\n", color_to_int(GREEN));
+        return 0;
+    }
+    else{
+        printToScreen("\nPembunuhan gagal\n", color_to_int(GREEN));
+        return 1;
+    }
 }
 
 

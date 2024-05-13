@@ -4,7 +4,7 @@
 
 ProcessManagerState process_manager_state = {
     .active_process_count = 0,
-    .process_list = 0,
+    .process_list = {{0}},
 };
 static int32_t next_pid = 1; 
 
@@ -42,6 +42,15 @@ for (int i = 0; i < PROCESS_COUNT_MAX; i++) {
         if (process_manager_state.process_list[i].metadata.pid == pid && process_manager_state.process_list[i].metadata.state != TERMINATED) {
 
             process_manager_state.process_list[i].metadata.state = TERMINATED;
+
+            for (uint32_t j = 0; j < process_manager_state.process_list[i].memory.page_frame_used_count; j++){
+                if (!paging_free_user_page_frame(
+                        (struct PageDirectory*) process_manager_state.process_list[i].context.page_directory_virtual_addr, 
+                        process_manager_state.process_list[i].memory.virtual_addr_used[j])
+                    ){
+                    return false;
+                }
+            }
 
             if (!paging_free_page_directory((struct PageDirectory*) process_manager_state.process_list[i].context.page_directory_virtual_addr)) {
                 return false;
@@ -114,4 +123,19 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
 
 exit_cleanup:
     return retcode;
+}
+
+void process_get_processes_info(ProcessMetadata* arr){
+    uint32_t arr_index = 0;
+
+    for(uint32_t i = 0; i < PROCESS_COUNT_MAX; i++){
+        if (process_manager_state.process_list->metadata.state != TERMINATED){
+            ProcessMetadata* currentMetadata = &process_manager_state.process_list[i].metadata;
+            arr[arr_index].pid = currentMetadata->pid;
+            memcpy(arr[arr_index].process_name, currentMetadata->process_name, 32);
+            arr[arr_index].state = currentMetadata->state;
+            arr[arr_index].priority = currentMetadata->priority;
+            arr_index++;
+        }
+    }
 }

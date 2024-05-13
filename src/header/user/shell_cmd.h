@@ -8,7 +8,30 @@
 #include "header/user/user-buffer.h"
 #include "header/user/user-shell.h"
 
+#define PROCESS_NAME_LENGTH_MAX                     32
+#define PROCESS_COUNT_MAX                           16
+#define PROCESS_CREATE_SUCCESS                      0
+#define PROCESS_CREATE_FAIL_MAX_PROCESS_EXCEEDED    1
+#define PROCESS_CREATE_FAIL_INVALID_ENTRYPOINT      2
+#define PROCESS_CREATE_FAIL_NOT_ENOUGH_MEMORY       3
+#define PROCESS_CREATE_FAIL_FS_READ_FAILURE         4
+
 extern struct ShellState main_state;
+
+typedef enum PROCESS_STATE {
+    TERMINATED,
+    RUNNING,
+    WAITING,
+    NEW,
+    READY
+} PROCESS_STATE;
+
+typedef struct {
+    uint32_t pid;                      
+    char process_name[PROCESS_NAME_LENGTH_MAX];        
+    int priority;   
+    PROCESS_STATE state;               
+} ProcessMetadata;
 
 void print_path_from_root(int cluster_number, uint16_t Color);
 int get_final_parent_cluster(char* path, int current_folder_cluster);
@@ -106,6 +129,34 @@ int mv(char* goal1, int goal1Length, char* goal2, int goal2Length);
 int find(char* goal, int goalLength);
 
 void dfs_find(uint32_t cluster_number, char* goal, int goalLength, char* path, char paths[64][256], int* pathCount);
+
+/*
+ * exec - Membuat proses baru, dengan executable ada pada filePath
+ *
+ *  return 0 : operasi berhasil
+ *  return 1 : file tidak ditemukan
+ *  return 2 : bukan file
+ *  return 3 : anomali
+ */
+int exec(char* filePath);
+
+/*
+ *  ps - Menunjukkan informasi proses yang sedang berjalan
+ *
+ */
+void ps();
+
+/*
+ *  kill - Menghentikan proses dengan process id = pid
+ *
+ *  return 0 : operasi berhasil
+ *  return 1 : pid tidak ditemukan
+ *  return 3 : anomali
+ */
+int kill(uint32_t pid);
+
+void clear();
+int rmr(char* goal, int goalLength);
 
 // ============================================ BATAS SUCI ===========================================
 void syscall(uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx);

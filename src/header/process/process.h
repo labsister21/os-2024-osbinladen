@@ -136,4 +136,6 @@ int32_t process_create_user_process(struct FAT32DriverRequest request);
  */
 bool process_destroy(uint32_t pid);
 
+void process_get_processes_info(ProcessMetadata* arr);
+
 #endif

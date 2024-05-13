@@ -5,6 +5,7 @@
 #include "header/driver/graphics.h"
 #include "header/filesystem/fat32.h"
 #include "header/driver/charframe.h"
+#include "header/process/process.h"
 
 void io_wait(void) {
     out(0x80, 0);
@@ -147,6 +148,34 @@ void syscall(struct InterruptFrame frame) {
             *((int8_t*) frame.cpu.general.edx) = move(
                 *((struct FAT32DriverRequest*) frame.cpu.general.ebx), *((struct FAT32DriverRequest*) frame.cpu.general.ecx)
             );
+            break;
+
+        /*
+        Syscall 13  : Destroy process
+        $ebx        : pid to be destroyed
+        $ecx        : unused
+        $edx        : retcode address
+        */
+        case 13:
+            *((int8_t*) frame.cpu.general.edx) = process_destroy(frame.cpu.general.ebx);
+            break;
+        /*
+        Syscall 14  : Create Process
+        $ebx        : request address
+        $ecx        : unused
+        $edx        : retcode address
+        */
+        case 14:
+            process_create_user_process(*((struct FAT32DriverRequest*) frame.cpu.general.ebx));
+            break;
+        /*
+        Syscall 15  : get_all_processes
+        $ebx        : address to array of process metadata
+        $ecx        : unused
+        $edx        : unused
+        */
+       case 15:
+            process_get_processes_info((ProcessMetadata*) frame.cpu.general.ebx);
             break;
     }
 }

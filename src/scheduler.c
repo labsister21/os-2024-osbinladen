@@ -27,7 +27,9 @@ void scheduler_init(void){
  * 
  * @param ctx Context to save to current running process control block
  */
-void scheduler_save_context_to_current_running_pcb(struct Context ctx);
+void scheduler_save_context_to_current_running_pcb(struct Context ctx){
+    process_manager_state.process_list[current_process_list_id].context = ctx;
+}
 
 /**
  * Trigger the scheduler algorithm and context switch to new process
@@ -48,6 +50,7 @@ __attribute__((noreturn)) void scheduler_switch_to_next_process(void){
         }
     }
 
+    process_manager_state.process_list[current_process_list_id].metadata.state = RUNNING;
     paging_use_page_directory((struct PageDirectory*) process_manager_state.process_list[current_process_list_id].context.page_directory_virtual_addr);
     process_context_switch(process_manager_state.process_list[current_process_list_id].context);
 }

@@ -42,6 +42,9 @@ const char keyboard_scancode_1_to_ascii_map_with_shift[256] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+void handle_right_arrow();
+void handle_left_arrow();
+
 // Activate keyboard ISR / start listen keyboard & save to buffer
 void keyboard_state_activate(void){
   activate_keyboard_interrupt();

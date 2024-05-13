@@ -19,4 +19,6 @@ struct ShellState {
 
 extern struct ShellState main_state;
 
+int main(void);
+
 #endif
