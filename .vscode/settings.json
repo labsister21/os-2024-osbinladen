@@ -21,7 +21,8 @@
         "graphics.h": "c",
         "shell_cmd.h": "c",
         "stdint.h": "c",
+        "user-buffer.h": "c",
         "process.h": "c",
-        "user-buffer.h": "c"
+        "timer.h": "c"
     },
 }

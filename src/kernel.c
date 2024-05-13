@@ -279,6 +279,7 @@ void kernel_setup(void) {
     load_gdt(&_gdt_gdtr);
     pic_remap();
     initialize_idt();
+    activate_timer_interrupt();
     activate_keyboard_interrupt();
     initialize_filesystem_fat32();
     gdt_install_tss();

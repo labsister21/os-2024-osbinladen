@@ -86,7 +86,7 @@ void cmdHandler(){
             rm(main_state.currentWord, strlen(main_state.currentWord));
         }
         else if (isStrEqual(main_state.currentWord, "debug")){
-            // int i = get_final_parent_cluster("wege/dito/bolang/gogo", 2);
+            ;
         }
         else if(isStrEqual(main_state.currentWord, "find")){
             get_next_word();

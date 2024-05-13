@@ -1,6 +1,7 @@
 #include "header/driver/charframe.h"
 #include "header/stdlib/string.h"
 #include "header/driver/keyboard.h"
+#include "header/driver/timer.h"
 
 int pos = 0;
 char charBuffer[TEXT_WIDTH*TEXT_HEIGHT];
@@ -141,5 +142,10 @@ void puts(char* buffer, int charCount, uint16_t textColor){
 }
 
 void draw_cursor(){
-    draw_char_at('|', pos/TEXT_WIDTH, pos % TEXT_WIDTH, BLUE, BLACK);
+    if (timer_get_tick() < 500){
+      draw_char_at('|', pos/TEXT_WIDTH, pos % TEXT_WIDTH, BLUE, BLACK);
+    }
+    else{
+      draw_char_at(' ', pos/TEXT_WIDTH, pos % TEXT_WIDTH, BLUE, BLACK);
+    }
 }
