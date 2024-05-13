@@ -172,11 +172,11 @@ struct PageDirectory* paging_create_new_page_directory(void) {
             page_directory_list[i].table[0x301].flag = flag;
             page_directory_list[i].table[0x301].lower_address = 1;
             page_directory_list[i].table[0x3F4].flag = flag;
-            page_directory_list[i].table[0x3F4].lower_address = 0;
+            page_directory_list[i].table[0x3F4].lower_address = 0x3F4;
             page_directory_list[i].table[0x3F5].flag = flag;
-            page_directory_list[i].table[0x3F5].lower_address = 0;
+            page_directory_list[i].table[0x3F5].lower_address = 0x3F5;
             page_directory_list[i].table[0x3F6].flag = flag;
-            page_directory_list[i].table[0x3F6].lower_address = 0;
+            page_directory_list[i].table[0x3F6].lower_address = 0x3F6;
 
             return &page_directory_list[i];
         }
