@@ -501,6 +501,9 @@ void delete_all_file(uint32_t fat_index){
  * return -1: error lain
  */
 int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar_request){
+    bool isSourceFolder = false;
+    bool isTargetFolder = false;
+
     // search source
     read_clusters(driver_state.dir_table_buf.table, src_request.parent_cluster_number, 1);
     if (driver_state.dir_table_buf.table[0].user_attribute != UATTR_NOT_EMPTY) {
@@ -523,6 +526,9 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
     if (src_index == -1) {
         return 1;
     }
+
+    if(driver_state.dir_table_buf.table[src_index].attribute == ATTR_SUBDIRECTORY)
+        isSourceFolder = true;
     
     // check if file with same name and extension exist
     struct FAT32DirectoryEntry target_dir_table[CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry)];
@@ -531,14 +537,41 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
     i = 2;
     while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && tar_index == 64) {
         if(target_dir_table[i].user_attribute == UATTR_NOT_EMPTY){
-            if (memcmp(target_dir_table[i].name, src_request.name, 8) == 0 &&
-                memcmp(target_dir_table[i].ext, src_request.ext, 3) == 0) {
-                tar_index = -1;
+            if (memcmp(target_dir_table[i].name, tar_request.name, 8) == 0 &&
+                memcmp(target_dir_table[i].ext, tar_request.ext, 3) == 0) {
+                    // check is the target a folder
+                    if(target_dir_table[i].attribute == ATTR_SUBDIRECTORY){
+                        isTargetFolder = true;
+                        tar_request.parent_cluster_number = 
+                            (unsigned int)target_dir_table[i].cluster_low | ((unsigned int)target_dir_table[i].cluster_high << 16);
+                        read_clusters(target_dir_table, tar_request.parent_cluster_number, 1);
+                        break;
+                    }
+                    else{
+                        tar_index = -1;
+                    }
             }
         } else {
             tar_index = i;
         }
         i+=1;
+    }
+
+    if(isTargetFolder){
+        tar_index  = 64;
+        i = 2;
+        while (i < CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry) && tar_index == 64) {
+            if(target_dir_table[i].user_attribute == UATTR_NOT_EMPTY){
+                if (memcmp(target_dir_table[i].name, src_request.name, 8) == 0 &&
+                    memcmp(target_dir_table[i].ext, src_request.ext, 3) == 0) {
+                        tar_index = -1;
+                }
+            } else {
+                tar_index = i;
+
+            }
+            i+=1;
+        }   
     }
 
     if(tar_index == -1){
@@ -557,14 +590,27 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
 
     // move to destined folder
     struct FAT32DirectoryEntry new_directory_entry = source;
-    memcpy(new_directory_entry.name, tar_request.name, 8);
-    memcpy(new_directory_entry.ext, tar_request.ext, 3);
+    if(!isTargetFolder){
+        memcpy(new_directory_entry.name, tar_request.name, 8);
+        memcpy(new_directory_entry.ext, tar_request.ext, 3);
+    }
     target_dir_table[tar_index] = new_directory_entry;
+
+    // if the moved item is folder change its parent folder
+    if(isSourceFolder){
+        struct FAT32DirectoryEntry result_dir_table[CLUSTER_SIZE / sizeof(struct FAT32DirectoryEntry)];
+        read_clusters(result_dir_table, source_cluster_number, 1);
+        memcpy(result_dir_table[0].name, new_directory_entry.name, 8);
+        memcpy(result_dir_table[0].ext, new_directory_entry.ext, 3);
+        result_dir_table[1].cluster_low = tar_request.parent_cluster_number & 0xFFFF;
+        result_dir_table[1].cluster_high = (tar_request.parent_cluster_number >> 16) & 0xFFFF;
+        write_clusters(result_dir_table, source_cluster_number, 1);
+    }
 
     // delete on old folder
     struct FAT32DirectoryEntry empty_entry = {0};
     driver_state.dir_table_buf.table[src_index] = empty_entry;
-    
+
     write_clusters(&driver_state.dir_table_buf, src_request.parent_cluster_number, 1);
     write_clusters(&target_dir_table, tar_request.parent_cluster_number, 1);
     return  0;
