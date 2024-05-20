@@ -84,7 +84,11 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
     }
 
     struct PageDirectory* allocatedPage = paging_create_new_page_directory();
-    paging_allocate_user_page_frame(allocatedPage, request.buf);
+
+    for(int i = 0; i < page_frame_count_needed - 1; i++){
+        paging_allocate_user_page_frame(allocatedPage, (void*)((uint32_t)request.buf + i*0x400000));
+    }
+    paging_allocate_user_page_frame(allocatedPage, 0xBFF00000);
 
     // Process PCB 
     int32_t p_index = process_list_get_inactive_index();
@@ -112,7 +116,8 @@ int32_t process_create_user_process(struct FAT32DriverRequest request) {
 
     paging_use_page_directory(currentPageDirectory);
 
-    new_pcb->context.cpu.esp = 0x400000 - 4;
+    new_pcb->context.cpu.esp = 0xBFFFFFFC;
+    new_pcb->context.cpu.ebp = 0xBFFFFFFC;
     new_pcb->context.cpu.cs = 0x1b;
     new_pcb->context.cpu.ds = 0x23;
     new_pcb->context.cpu.es = 0x23;

@@ -119,9 +119,7 @@ bool paging_allocate_user_page_frame(struct PageDirectory *page_dir, void *virtu
         .use_pagesize_4_mb = 1,
     };
 
-    for(int j = 0; j < 1; j++){
-        update_page_directory_entry(page_dir, (void*)(i*PAGE_FRAME_SIZE) + j*2048, virtual_addr + j*2048, newFlag);
-    }
+    update_page_directory_entry(page_dir, (void*)(i*PAGE_FRAME_SIZE), virtual_addr, newFlag);
 
     return true;
 }
