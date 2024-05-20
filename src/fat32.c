@@ -451,7 +451,9 @@ int8_t delete_all(struct FAT32DriverRequest request){
 
     // write update on storage
     struct FAT32DirectoryEntry empty_entry = {0};
-    driver_state.dir_table_buf.table[index] = empty_entry;
+    uint8_t last_idx = get_dir_last_index();
+    driver_state.dir_table_buf.table[index] = driver_state.dir_table_buf.table[last_idx];
+    driver_state.dir_table_buf.table[last_idx] = empty_entry;
     driver_state.fat_table.cluster_map[entry_index] = FAT32_FAT_EMPTY_ENTRY;
     write_clusters(&driver_state.dir_table_buf, request.parent_cluster_number, 1);
     write_clusters(driver_state.fat_table.cluster_map, FAT_CLUSTER_NUMBER, 1);
@@ -609,8 +611,9 @@ int8_t move(struct FAT32DriverRequest src_request, struct FAT32DriverRequest tar
 
     // delete on old folder
     struct FAT32DirectoryEntry empty_entry = {0};
-    driver_state.dir_table_buf.table[src_index] = empty_entry;
-
+    uint8_t last_idx = get_dir_last_index();
+    driver_state.dir_table_buf.table[src_index] = driver_state.dir_table_buf.table[last_idx];
+    driver_state.dir_table_buf.table[last_idx] = empty_entry;
     write_clusters(&driver_state.dir_table_buf, src_request.parent_cluster_number, 1);
     write_clusters(&target_dir_table, tar_request.parent_cluster_number, 1);
     return  0;
