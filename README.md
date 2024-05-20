@@ -23,49 +23,20 @@ git clone https://github.com/labsister21/os-2024-osbinladen.git
 cd os-2024-osbinladen
 ```
 - Run the program
+To run the program for the first time do
 ```
 make lock1
+```
+for next use do
+```
+make run
 ```
 
 ## Directory tree
 ```
 .
 ├── bin
-│   ├── OS2024.iso
-│   ├── asmGaming.o
-│   ├── charframe.o
-│   ├── clock
-│   ├── cmos.o
-│   ├── context_switch.o
-│   ├── decoyy.tx
-│   ├── disk.o
-│   ├── fat32.o
-│   ├── framebuffer.o
-│   ├── gdt.o
-│   ├── graphics.o
-│   ├── idt.o
-│   ├── inserter
-│   ├── interrupt.o
-│   ├── intsetup.o
-│   ├── kernel
-│   ├── kernel-entrypoint.o
-│   ├── kernel.o
-│   ├── keyboard.o
-│   ├── paging.o
-│   ├── peda-session-1.txt
-│   ├── peda-session-unknown.txt
-│   ├── portio.o
-│   ├── process.o
-│   ├── realModeGaming.o
-│   ├── scheduler.o
-│   ├── shell
-│   ├── shell_elf
-│   ├── storage.bin
-│   ├── string.o
-│   └── timer.o
 ├── other
-│   ├── Screenshot.png
-│   └── grub1
 ├── src
 │   ├── archive_src
 │   │   ├── header
