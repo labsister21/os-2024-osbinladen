@@ -1,1 +1,4 @@
-*.o
+bin/*.iso
+bin/*.o
+bin/kernel
+bin/*.txt
