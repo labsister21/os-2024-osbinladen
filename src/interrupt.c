@@ -7,6 +7,7 @@
 #include "header/driver/charframe.h"
 #include "header/process/process.h"
 #include "header/driver/cmos.h"
+#include "header/scheduler/scheduler.h"
 
 void io_wait(void) {
     out(0x80, 0);
@@ -214,6 +215,9 @@ void syscall(struct InterruptFrame frame) {
          */
         case 19:
             set_screen_color(BLACK);
+            break;
+        case 20:
+            process_destroy(current_process_list_id);
             break;
     }
 }

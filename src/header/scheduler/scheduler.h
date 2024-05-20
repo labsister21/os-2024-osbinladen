@@ -3,6 +3,8 @@
 
 #include "header/process/process.h"
 
+extern int current_process_list_id;
+
 /**
  * Read all general purpose register values and set control register.
  * Resume the execution flow back to ctx.eip and ctx.eflags
