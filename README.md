@@ -1,8 +1,28 @@
-# os-2024-osbinladen
+# IF2230-2024-OSbinLaden
 ![](other/Screenshot.png)
 
-## Requirements
-- Linux Environment
+## **Table of Contents**
+* [Authors](#authors)
+* [Program Description](#program-description)
+* [Required Program](#required-program)
+* [How to Run The Program](#how-to-run-the-program)
+* [Folders and Files Directory](#folders-and-files-description)
+
+## **Authors** 
+|Nama|NIM|Kelas|
+|---|---|---|
+|Abdul Rafi Radityo Hutomo|13522089|K01|
+|Rayhan Fadhlan Azka|13522095|K01|
+|Rayendra Althaf Taraka Noor|13522107|K01|
+|William Glory Henderson|13522113|K01|
+
+## **Program Description**
+This program will serve as an introduction to kernel development and concretely demonstrate the subsystems present in an operating system. <br> 
+The target platform for the operating system is x86 32-bit Protected Mode, which will be run using QEMU. <br>
+The operating system includes Toolchain, Kernel, GDT, Interrupts, Drivers, File System, Paging, User Mode, Shell, Processes, Scheduler, Multitasking.
+
+## **Required Program**
+- [Linux Environment](https://learn.microsoft.com/en-us/windows/wsl/install)
 - [Netwide Assembler](https://www.nasm.us/) 
 - [GNU C Compiler](https://man7.org/linux/man-pages/man1/gcc.1.html) 
 - [GNU Linker](https://linux.die.net/man/1/ld)
@@ -10,29 +30,31 @@
 - [GNU Make](https://www.gnu.org/software/make/)
 - [genisoimage](https://linux.die.net/man/1/genisoimage)
 
-## How To Run
+## **How to Run The Program**
 
 - Install Requirements
 ```
-sudo apt update
 sudo apt install -y nasm gcc qemu-system-x86 make genisoimage
 ```
 - Clone and open the repository folder
 ```
 git clone https://github.com/labsister21/os-2024-osbinladen.git
+```
+- Change the current directory into the cloned repository 
+```
 cd os-2024-osbinladen
 ```
 - Run the program
-To run the program for the first time do
+For the first time
 ```
 make lock1
 ```
-for next use do
+For the next use
 ```
 make run
 ```
 
-## Directory tree
+## **Folders and Files Directory**
 ```
 .
 ├── bin
@@ -115,12 +137,3 @@ make run
 ├── README.md
 └── makefile
 ```
-
-## Contributors
-
-|Nama|NIM|Kelas|
-|---|---|---|
-|Abdul Rafi Radityo Hutomo|13522089|K01|
-|Rayhan Fadhlan Azka|13522095|K01|
-|Rayendra Althaf Taraka Noor|13522107|K01|
-|William Glory Henderson|13522113|K01|
